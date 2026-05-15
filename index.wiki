@@ -2,6 +2,7 @@
 
 This paper is constructed based on the main ideas:
 [[main_idea]]
+[[Another_engineering_framing]]
 
 To make the materials into submittable paper, it is recommended to write a sketch in advance. In writing this paper, every paragraph can be expanded by one or multiple points listed in the sketch
 [[sketch]]
@@ -20,7 +21,8 @@ Evidence is indispensible for an essay to make the arguments convicing, for whic
 - What was impossible before should be noticed
 
 [[condition|Evidence on the effect of condition number]]
-
+[[Propagation|How the starting vector influence the second system]]
+[[Benchmark]]
 Based on the evidence, some conclusions can be drawn, as a direct support for the main ideas of the essay.
 
 [[conclusion]]
