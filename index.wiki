@@ -2,7 +2,7 @@
 
 This paper is constructed based on the main ideas:
 [[main_idea]]
-[[Another_engineering_framing]]
+[[engineering_idea|Another_engineering_framing]]
 
 To make the materials into submittable paper, it is recommended to write a sketch in advance. In writing this paper, every paragraph can be expanded by one or multiple points listed in the sketch
 [[sketch]]
