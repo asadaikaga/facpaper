@@ -1,0 +1,28 @@
+= The main components of this project (paper) =
+
+This paper is constructed based on the main ideas:
+[[main_idea]]
+
+To make the materials into submittable paper, it is recommended to write a sketch in advance. In writing this paper, every paragraph can be expanded by one or multiple points listed in the sketch
+[[sketch]]
+
+- Introduction
+- Problem
+- Numerical Experiment
+- Conclusion
+- Future work
+
+Evidence is indispensible for an essay to make the arguments convicing, for which the counterpart in technical genres are always experiments.
+
+- What is different should be noticed
+- What can be done should be noticed
+- What is different greatly should be noticed
+- What was impossible before should be noticed
+
+[[condition|Evidence on the effect of condition number]]
+
+Based on the evidence, some conclusions can be drawn, as a direct support for the main ideas of the essay.
+
+[[conclusion]]
+
+BTW, don't forget this is an technical essay, so it is better the terms and expressions are strictly restriced to technical scale.
