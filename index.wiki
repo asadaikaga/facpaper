@@ -1,30 +1,20 @@
-= The main components of this project (paper) =
+= index of this paper =
 
-This paper is constructed based on the main ideas:
-[[main_idea]]
-[[engineering_idea|Another_engineering_framing]]
+== A first draft of presentations ==
+This have been done in main.tex
+== How to understand the probelm ==
+In this research, we consider the problem ABx=b in a general Krylov subspace iterative method framework.
 
-To make the materials into submittable paper, it is recommended to write a sketch in advance. In writing this paper, every paragraph can be expanded by one or multiple points listed in the sketch
-[[sketch]]
+There are basically three types of numerical methods to solve a linear system problem.
+However, when solving our special case, extra techniques should be considered.
+In the present paper, we consider two approaches to solve a linear system of this structure.
+The first approach apply numerical methods directly on the linear system Cx=b, under the condition C = AB.
+The second approach consider an equivalent system Ay=b, Bx=y, leading to a two stage method first solving Ay=b, then solving Bx=y.
+When corporating the first approach with numerical methods, Krylov subspace method is recommended considering the computational complexity, since in this method matrix-vector product is implemented in each step, reducing the complexity O(n^3) of matrix multiplication to O(n) when A, B are sparse. The second approach can be corporated with all three types of numerical methods.
 
-- Introduction
-- Problem
-- Numerical Experiment
-- Conclusion
-- Future work
+In a same type of problem, an iterative method often converges faster when then condition number is smaller, and slower when the condition number is larger. And the convergence of the two approaches are not only relevant to the condition number of C, but also relevant to the condition number of A and B. For example, if the second approach is applied, when A has extremely large condition number, the iterative method could possibly stagnate or breakdown, forcing the iterations to stop.
 
-Evidence is indispensible for an essay to make the arguments convicing, for which the counterpart in technical genres are always experiments.
+* we run numerical experiments
+* we have conclusions
+* in appendix we have theoretical analysis
 
-- What is different should be noticed
-- What can be done should be noticed
-- What is different greatly should be noticed
-- What was impossible before should be noticed
-
-[[condition|Evidence on the effect of condition number]]
-[[Propagation|How the starting vector influence the second system]]
-[[Benchmark]]
-Based on the evidence, some conclusions can be drawn, as a direct support for the main ideas of the essay.
-
-[[conclusion]]
-
-BTW, don't forget this is an technical essay, so it is better the terms and expressions are strictly restriced to technical scale.
