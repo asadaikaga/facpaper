@@ -2,6 +2,16 @@
 
 == A first draft of presentations ==
 This have been done in main.tex
+And this version have received several advices.
+
+1. All problems satisfy the condition max{k(A),k(B)}<k(AB)
+2. But the case k(AB)<min{ k(A), k(B) } is not uncommon
+3. When using the random matrix R, A and B set the same R
+4. But all we need is the condition number
+5. Thus there are several setting that can be considered
+	1. change R different for A and B
+	2. A random matrix S and a SS matrix A
+	3. A matrix A and its preconditioner M
 == How to understand the probelm ==
 In this research, we consider the problem ABx=b in a general Krylov subspace iterative method framework.
 
