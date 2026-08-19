@@ -1,0 +1,437 @@
+%! TeX program = lualatex
+% Inbuilt themes in beaxexier
+\documentclass[aspectratio=169]{beamer}
+% \documentclass{beamer}
+\input{nlaex}
+\usepackage[normalem]{ulem}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{fontspec}
+\usepackage[sfdefault]{FiraSans}
+\usefonttheme{professionalfonts}
+\usepackage[mathrm=sym]{unicode-math}
+\renewcommand{\bm}{\symbfit}
+\setmathfont{Fira Math}
+% \setmainfont{}
+% \setsansfont{Fira Sans}
+% \setsansfont{Fira Sans}
+% Theme choice:
+\usetheme{metropolis}
+\newfontfamily\ns{Noto Sans Symbols}
+\newfontfamily\nns{Noto Sans Symbols 2}
+\newfontfamily\fs{Fira Sans}
+\newfontfamily\jm{JetBrains Mono}
+\newcommand{\maru}{\begin{jm}○\end{jm}}
+\newcommand{\basu}{\begin{jm}✗\end{jm}}
+\newcommand{\cone}{\begin{ns}①\end{ns}}
+\newcommand{\ctwo}{\begin{ns}②\end{ns}}
+\newcommand{\cthree}{\begin{ns}③\end{ns}}
+\newcommand{\cfour}{\begin{ns}④\end{ns}}
+\newcommand{\cfive}{\begin{ns}⑤\end{ns}}
+\newcommand{\csix}{\begin{ns}⑥\end{ns}}
+\newcommand{\fsec}[1]{%
+  % \medskip
+  \textbf{#1}\par
+  \smallskip
+}
+
+% Title page details: 
+\title{On two numerical approaches for linear systems $AB \bm{x} = \bm{b}$} 
+\author{XU Zhixuan \inst{1} \and Sogabe Tomohiro \inst{1} \and Kemmochi Tomoya \inst{2} \and Shao-Liang Zhang \inst{1}}
+\institute{
+	\inst{1} \textit{Department of Applied Physics, Nagoya University}
+	\and 
+	\inst{2} \textit{Department of Mathematics, Meijo University}
+	}
+\date{\today}
+% \logo{\includegraphics[width = 0.15\linewidth]{pix/nagoya.png}}
+\begin{document}
+
+% Title page frame
+\begin{frame}[noframenumbering, plain]
+    \titlepage 
+\end{frame}
+
+% Remove logo from the next slides
+\logo{}
+
+
+% Outline frame
+\begin{frame}{Outline}
+    \tableofcontents
+\end{frame}
+
+
+% Lists frame
+\section{Research problem}
+\begin{frame}{Numerical methods for a linear system $AB \bm{x} = \bm{b}$}
+	We consider numerically solving a linear system in the form  
+	\begin{equation}\label{eq:fls}
+	AB \bm{x} = \bm{b}
+	.
+	\end{equation}	
+ 
+
+In our discussion, a numerical method for a mathematical problem is:
+\begin{itemize}
+	\item applicable in finite precision arithmetics
+	\item terminates in finite steps
+	\item error of the approximated solution is clear 
+\end{itemize}
+\textbf{Research subject}
+In the present research, we study two numerical approaches, \textit{the separate approach} and \textit{the combined approach}.
+\end{frame}
+
+\begin{frame}{Research Background}
+	% \vspace{0pt}
+	Consider the three numerical methods for solving a linear system $A \bm{x} = \bm{b}$
+	\begin{enumerate}
+		\item Direct methods
+		\item Stationary iterative methods
+		\item Krylov subspace methods
+	\end{enumerate}
+	All of these methods can be corperated to solve linear system $AB \bm{x} = \bm{b}$.
+		\begin{table}[t]
+		\begin{tabular}{l c c}
+			\toprule
+			 & Separate & Combined\\	
+			\midrule
+			Direct&  \maru & \basu \\
+			Stationary & \maru & \basu \\
+			Krylov & \maru & \maru \\
+			\bottomrule
+		\end{tabular}
+		\caption{Compatibility with two approaches. \maru indicates compatible, \basu uncompatible}
+		\end{table}
+\end{frame}
+
+\begin{frame}{Approach 1: The separate approach (Two-stage solve)}
+	Approach 1 is based on the equivalent expression
+	\begin{equation}
+	\begin{cases}
+		A \bm{y} = \bm{b},\\
+		B \bm{x} = \bm{y}.
+	\end{cases}
+	\end{equation}
+Two linear systems are sequentially solved in the following pipeline
+\begin{center}
+solve $A \bm{y} = \bm{b}$ $|$ solve $B \bm{x} = \bm{y}$
+\end{center}
+\begin{block}{Example: on its numerical realization}
+	\vspace{1pt}
+	\begin{tabular}{c c}		
+direct $A \bm{y} = \bm{b}$ $|$ direct $B \bm{x} = \bm{y}$ & bicgstab $A \bm{y} = \bm{b}$ $|$ bicgstab $B \bm{x} = \bm{y}$\\
+stationary $A \bm{y} = \bm{b}$ $|$ stationary $B \bm{x} = \bm{y}$ & direct $A \bm{y} = \bm{b}$ $|$ bicgstab $B \bm{x} = \bm{y}$\\
+krylov $A \bm{y} = \bm{b}$ $|$ krylov $B \bm{x} = \bm{y}$ & gmres $A \bm{y} = \bm{b}$ $|$ bicgstab $B \bm{x} = \bm{y}$
+	\end{tabular}
+\end{block}
+\end{frame}
+
+\begin{frame}{Approach 2: The combined approach (Direct solve)}
+	Approach 2 solves the linear system $ AB \bm{x} = \bm{b}$ by the form $C \bm{x} = \bm{b}, C = AB$ 
+	\begin{block}{Different realizations of $C=AB$, when $A$, $B$ sparse}
+		\vspace{1pt}
+	% When applying approach 1 to reconstruct the solution of $AB \bm{x} = \bm{b}$, at least one of the following forms will be exploited:
+		$A \in \mathbb{R} ^{n \times n}, B \in \mathbb{R} ^{n \times n}, N_{nz}(A)=O(n), N_{nz}(B) = O(n)$
+	\begin{itemize}
+		\item \textit{\sout{Explicit formulation}}: matrix multiplication $AB$ $\rightarrow O({n}^{3})$
+		\item \textit{Implicit formulation}: matrix-vector product  $\underbracket{A(B \bm{b})}_{\text{Krylov}}$$\rightarrow O(n)$
+	\end{itemize}
+\end{block}
+\begin{block}{Warning (Krylov subspce methods):}
+	\vspace{1pt}
+	Memory $\rightarrow$ Sparsity 
+$\xrightarrow{\text{specifically}}$ Sparsity of $AB$\\
+	Accuracy $\rightarrow$ \underline{Condition}
+$\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
+	\vspace{0.5em}
+	Number of iterations $\rightarrow$ \underline{Condition}
+	$\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
+\end{block}
+% The direct combined approach is worth considering (in computational cost) when \textcolor{red}{Krylov subspace method} is applied.
+\end{frame}
+
+\begin{frame}{Research Motivation}
+	\begin{block}{Things we have known}
+		\vspace{1pt}	
+		\begin{enumerate}{}	
+			\item \textit{the separate approach:} flexible solver choice on each stage
+			\item \textit{the combined approach:} specific to Krylov methods, condition of $AB$
+		\end{enumerate}
+	\end{block}
+	\begin{block}{Things to make clear}
+		\vspace{1pt}	
+	\begin{enumerate}{}
+		\item[Q1:] rules for setting up solvers in \textit{the separate approach}
+		\item[Q2:] conditions when \textit{the combined approach} is a good choice \& those when \textit{the separate approach} is a good choice
+		\item[Q3:] what will happen if preconditioned algorithms are applied?
+	\end{enumerate}
+	\end{block}
+	\begin{alertblock}{To answer the questions}
+		\vspace{1pt}
+		classification of $A,B$ $\rightarrow$ condition number $\rightarrow$ convergence and accuracy
+	\end{alertblock}
+\end{frame}
+% \begin{frame}{Condition number and our classification}
+% 	\begin{tikzpicture}[
+%     font=\small,
+%     >=Latex,
+% ]
+% 
+% % --- subtle quadrant backgrounds ---
+% \fill[black!3]
+%     (0,3) rectangle (5,6);
+% 
+% \fill[black!6]
+%     (5,3) rectangle (10,6);
+% 
+% \fill[black!6]
+%     (0,0) rectangle (5,3);
+% 
+% \fill[black!3]
+%     (5,0) rectangle (10,3);
+% 
+% % --- axes ---
+% \draw[->, thick]
+%     (0,3) -- (10.5,3)
+%     node[right] {Speed};
+% 
+% \draw[->, thick]
+%     (5,0) -- (5,6.5)
+%     node[above] {Accuracy};
+% 
+% % --- quadrant labels ---
+% \node[align=center, opacity=.55]
+%     at (2.5,5.3)
+%     {\footnotesize SLOW\\[-2pt]ACCURATE};
+% 
+% \node[align=center, opacity=.55]
+%     at (7.5,5.3)
+%     {\footnotesize FAST\\[-2pt]ACCURATE};
+% 
+% \node[align=center, opacity=.55]
+%     at (2.5,.7)
+%     {\footnotesize SLOW\\[-2pt]INACCURATE};
+% 
+% \node[align=center, opacity=.55]
+%     at (7.5,.7)
+%     {\footnotesize FAST\\[-2pt]INACCURATE};
+% 
+% % --- methods ---
+% \node[
+%     rounded corners=3pt,
+%     fill=black!8,
+%     inner xsep=8pt,
+%     inner ysep=4pt
+% ] at (3,4.1) {$\kappa$ small};
+% 
+% \node[
+%     rounded corners=3pt,
+%     fill=black!8,
+%     inner xsep=8pt,
+%     inner ysep=4pt
+% ] at (7,4.0) {$\kappa$ small};
+% 
+% \node[
+%     rounded corners=3pt,
+%     fill=black!8,
+%     inner xsep=8pt,
+%     inner ysep=4pt
+% ] at (3,2.0) {$\kappa$ large};
+% 
+% \node[
+%     rounded corners=3pt,
+%     fill=black!8,
+%     inner xsep=8pt,
+%     inner ysep=4pt
+% ] at (7,2.0) {$\kappa$ large};
+% 
+% \end{tikzpicture}
+% \end{frame}
+
+\section{Classifications on the model problem: Toeplitz matrices}
+\begin{frame}{Numerical experiments}
+	\textbf{Motivation:}
+
+	It is widely recognized that the convergence rate of a linear system $C \bm{x} = \bm{b}$ is relevant to conditioin number $\kappa(C)$. However, for linear system $AB \bm{x} = \bm{b}$, the convergence is also relevant to both $\kappa(A), \kappa(B)$.
+	
+
+	\textbf{Experiment objective}
+	\begin{itemize}
+		\item Compare the convergence rate and accuracy of Approach 1 and Approach 2 under different condition number $\kappa(A)$ and $\kappa(B)$ settings.
+	\end{itemize}
+	\textbf{Experiment Problem and Methods}
+	A, B are random sparse matrices, and problems are solved with the bicgstab function in MATLAB
+\end{frame}
+\begin{frame}{Algorithmic behaviour in relation to the condition number (residual norm)}
+	\textbf{Problem:} Let $R\in \mathbb{R}^{n\times n}$ be a random sparse matrix, and $ D \in \mathbb{R}^{n\times n}$ be a diagonal matrix
+	\begin{itemize}
+		\item $A = R + a_1 * D$
+		\item $B = R + a_2 * D$
+	\end{itemize}
+	\begin{table}\label{tab:1}
+		\begin{tabular}{c c c c c}
+			\toprule
+			method & $a_1$ & $a_2$ & iter. & true rel. res.\\
+			\midrule
+			direct & $1000$ & $900$ & $153$ & $7.9608\times 10^{-7}$\\
+			two-stage & $1000$ & $900$ & $63$ & $5.3264\times 10^{-7}$\\
+			direct & $1000$ & $20$ & $254$ & $2.7258\times 10^{-7}$\\
+			two-stage & $1000$ & $20$ & $91$ & $ 9.9434\times 10^{7}$\\
+			direct & $15$ & $900$ & $329$ & $7.2945\times 10^{-7}$\\
+			two-stage & $15$ & $900$ & $125$ & $6.3144\times 10^{-7}$\\
+			direct & $15$ & $20$ & $619$ & $6.7655\times 10^{7}$\\
+			two-stage & $15$ & $20$ & $116$ & $2.9931\times 10^{-7}$\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+\end{frame}
+\begin{frame}{Algorithmic behaviour in relation to the condition number (error norm)}
+	
+	\textbf{Problem:} Let $R\in \mathbb{R}^{n\times n}$ be a random sparse matrix, and $D\in \mathbb{R}^{n\times n}$ be a diagonal matrix
+	\begin{itemize}
+		\item $A = R + a_1 * D$
+		\item $B = R + a_2 * D$
+	\end{itemize}
+	\begin{table}\label{tab:1}
+		\begin{tabular}{c c c c c}
+			\toprule
+			method & $a_1$ & $a_2$ & iter. & rel. err.\\
+			\midrule
+			direct & $1000$ & $900$ & $153$ & $0.0041$\\
+			two-stage & $1000$ & $900$ & $63$ & $0.0005$\\
+			direct & $1000$ & $20$ & $254$ & $0.0055$\\
+			two-stage & $1000$ & $20$ & $91$ & $0.0061$\\
+			direct & $15$ & $900$ & $329$ & $0.0062$\\
+			two-stage & $15$ & $900$ & $125$ & $0.0052$\\
+			direct & $15$ & $20$ & $619$ & $0.0680$\\
+			two-stage & $15$ & $20$ & $116$ & $0.0317$\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+\end{frame}
+\begin{frame}{Algorithmic behaviour in relation to the condition number (residual norm)}
+	\textbf{Problem:} Let $R\in \mathbb{R}^{n\times n}$ be a random sparse matrix, and $ D \in \mathbb{R}^{n\times n}$ be a diagonal matrix
+	\begin{itemize}
+		\item $A = R_1 + a_1 * D$, then let $A(1,1) = A(1,1)\times 10^{3}$
+		\item $B = R_2 + a_2 * D$, then let $B(1,1) = B(1,1) \times 10^{-3}$
+	\end{itemize}
+	\begin{table}\label{tab:1}
+		\begin{tabular}{c c c c c}
+			\toprule
+			method & $a_1$ & $a_2$ & iter. & true rel. res.\\
+			\midrule
+			direct & $100$ & $50$ & $16$ & $9.4735\times 10^{-7}$\\
+			two-stage & $100$ & $50$ & $23$ & $2.2419\times 10^{-4}$\\
+			direct & $1000$ & $20$ & $254$ & $2.7258\times 10^{-7}$\\
+			two-stage & $1000$ & $20$ & $91$ & $ 9.9434\times 10^{7}$\\
+			direct & $15$ & $900$ & $329$ & $7.2945\times 10^{-7}$\\
+			two-stage & $15$ & $900$ & $125$ & $6.3144\times 10^{-7}$\\
+			direct & $15$ & $20$ & $619$ & $6.7655\times 10^{7}$\\
+			two-stage & $15$ & $20$ & $116$ & $2.9931\times 10^{-7}$\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+\end{frame}
+
+\begin{frame}{Algorithmic behaviour in relation to the condition number (error norm)}
+	
+	\textbf{Problem:} Let $R\in \mathbb{R}^{n\times n}$ be a random sparse matrix, and $D\in \mathbb{R}^{n\times n}$ be a diagonal matrix
+	\begin{itemize}
+		\item $A = R_1 + a_1 * D$
+		\item $B = R_2 + a_2 * D$
+	\end{itemize}
+	\begin{table}\label{tab:1}
+		\begin{tabular}{c c c c c}
+			\toprule
+			method & $a_1$ & $a_2$ & iter. & rel. err.\\
+			\midrule
+			direct & $100$ & $50$ & $16$ & $3.2882\times 10^{-6}$\\
+			two-stage & $100$ & $50$ & $23$ & $5.5756\times 10^{-5}$\\
+			direct & $1000$ & $20$ & $254$ & $0.0055$\\
+			two-stage & $1000$ & $20$ & $91$ & $0.0061$\\
+			direct & $15$ & $900$ & $329$ & $0.0062$\\
+			two-stage & $15$ & $900$ & $125$ & $0.0052$\\
+			direct & $15$ & $20$ & $619$ & $0.0680$\\
+			two-stage & $15$ & $20$ & $116$ & $0.0317$\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+\end{frame}
+
+\begin{frame}{estimated condition number of the problem}
+	\begin{table}
+		\begin{tabular}{ c c c c c}
+			\toprule
+			$a_1$ & $a_2$ & $\kappa(a)$ & $\kappa(b)$ & $\kappa(ab)$\\
+			\midrule
+			$100$ & $50$ &  $7.1200\times 10^{3}$ & $1.4675\times 10^{4}$ &  $6.5934\times 10^{3}$\\
+			$1000$ & $20$ & $145.4249$ & $5.1060\times 10^{3}$ & $4.2768\times 10^{5}$ \\ 
+			$15$ & $900$ & $6.4982\times 10^{3}$ & $147.7126$ & $9.8099\times 10^{4}$\\
+			$15$ & $20$ & $6.4982\times 10^{3}$ & $5.1060\times 10^{3}$ & $9.4116\times 10^{5}$\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+\end{frame}
+\section{Test the classifications on matrix market problems}
+\section{Conclusions and future work}
+\begin{frame}{Conclusions}
+	
+	\begin{itemize}
+		\item \textbf{Direct Combined Approach}: Error is bounded by the condition number of the product $C = AB$.
+		\item \textbf{Two-Stage Approach}: Error in $y$ ($\| \delta y \| \propto \kappa(A)$) propagates to $x$. 
+		\item \textbf{Observation}: If $A$ is extremely ill-conditioned, the intermediate solution $y$ may lose significant precision, leading to stagnation in the second stage.
+	\end{itemize}
+
+\end{frame}
+\begin{frame}{Summary and future directions}
+	\begin{itemize}
+		\item \textbf{Summary}: Direct approach is more robust against ill-conditioning but computationally intensive if sparsity is not preserved. Two-stage approach is flexible but requires careful error management.
+		\item \textbf{Future Work}: 
+		\begin{itemize}
+			\item Test the two approach on more extreme cases, eg. when Krylov subspace stagnate ot breakdown
+			\item Developing adaptive switching between approaches based on $\kappa(A), \kappa(B)$.
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+\begin{frame}{Research plans}
+	\begin{enumerate}
+		\item EASIAM $\rightarrow$ enrich this work
+		\item ICMASE $\rightarrow$ another work on hybrid Krylov subspace method
+	\end{enumerate}
+\end{frame}
+\section{Appendix}
+\begin{frame}{estimated condition number of the problem}
+	\begin{table}
+		\begin{tabular}{ c c c c c}
+			\toprule
+			$a_1$ & $a_2$ & $\kappa(a)$ & $\kappa(b)$ & $\kappa(ab)$\\
+			\midrule
+			$1000$ & $900$ &  $145.4249$ & $147.7126$ &  $1.8481\times 10^{4}$\\
+			$1000$ & $20$ & $145.4249$ & $5.1060\times 10^{3}$ & $4.2768\times 10^{5}$ \\ 
+			$15$ & $900$ & $6.4982\times 10^{3}$ & $147.7126$ & $9.8099\times 10^{4}$\\
+			$15$ & $20$ & $6.4982\times 10^{3}$ & $5.1060\times 10^{3}$ & $9.4116\times 10^{5}$\\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+\end{frame}
+\begin{frame}{Special cases}
+	\textbf{Preconditioning}:
+	\begin{itemize}
+		\item Should we precondition $A$ and $B$ separately or the product $AB$?
+		\item Left preconditioning: $M^{-1}ABx = M^{-1}b$.
+		\item Split preconditioning: $M_A^{-1}AM_B^{-1}BM_B x = M_A^{-1}b$.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{A residual norm analysis}
+	Considering the two-stage method:
+	\begin{equation}
+		\|r\| = \|b - ABx\| = \|Ay - A(Bx)\| = \|A(y - Bx)\| \le \|A\| \|y - Bx\|
+	\end{equation}
+	This shows that even if the second system $Bx=y$ is solved with a small residual, the global residual can be magnified by $\|A\|$.
+\end{frame}
+
+\end{document}
