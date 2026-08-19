@@ -1,0 +1,177 @@
+%----------------------------%
+\section{Introduction}\label{sec:1}
+%----------------------------%
+%% Start to write the introduction
+We consider linear systems of the following form:
+%
+\begin{equation}\label{sec:1:eq:FLS}
+    AB\boldsymbol{x}= \boldsymbol{b},
+\end{equation}
+%
+where $A\in \mathbb{R}^{N\times N}$ and $B\in \mathbb{R}^{N\times N}$ are assumed to be large and sparse nonsingular matrices, and $\boldsymbol{b} \in \mathbb{R}^N$ is a right-hand side vector. Linear system \eqref{sec:1:eq:FLS}  arises in the subproblems of product eigenvalue problems \cite{WA05} and a Pad\'e approximation to matrix function \cite[p.204]{SO23}. When $A\in \mathbb{R}^{m \times k}$, $B \in \mathbb{R}^{k \times n}$, the problem is a generalization of the normal
+equation of least square problem $A^\top A\boldsymbol{x}=\boldsymbol{b}$, where $A\in \mathbb{R}^{m\times k}$, $\boldsymbol{b}\in \mathbb{R}^{k}$. This generalization of the normal equation is discussed in \cite{DU24}. However, this situation is different from our problem setting.
+\par
+To the best of our knowledge, there are few articles on numerical methods for linear system \eqref{sec:1:eq:FLS}. In our article, three numerical methods for linear systems \eqref{sec:1:eq:FLS} are considered.  Each method implements numerical methods for linear system $A\boldsymbol{x}=\boldsymbol{b}$ (e.g. direct methods, stationary iterative methods and Krylov subspace methods) by one implementing approach, leading to numerical methods for linear system \eqref{sec:1:eq:FLS}. We present the
+three implementing approaches as follows.
+
+\par
+\begin{enumerate}
+    \item The first approach considers the product of two factors $ A , B$ as one operator $ C $, thus the linear system $C\boldsymbol{x}=\boldsymbol{b}$ is solved.
+    \item  The second approach first solves $A\boldsymbol{y}=\boldsymbol{b}$, then solves $B\boldsymbol{x}=\boldsymbol{y}$.
+    \item  The third approach solves the augmented system
+\begin{equation*}%\label{sec:2:eq:ALS}
+    \mathcal{A}\Tilde{\boldsymbol{x}}=\Tilde{\boldsymbol{b}},\quad
+\mathcal{A} = \begin{bmatrix}
+    I & -B\\
+    A & O
+\end{bmatrix},
+\Tilde{\boldsymbol{x}} =\begin{bmatrix}
+    \boldsymbol{y}\\
+    \boldsymbol{x}
+\end{bmatrix},
+\Tilde{\boldsymbol{b}}=\begin{bmatrix}
+    \boldsymbol{0}\\
+    \boldsymbol{b}
+\end{bmatrix},
+\end{equation*}
+the solution for \eqref{sec:1:eq:FLS} is $\boldsymbol{x}$.
+\end{enumerate}
+\par
+Our research is motivated by a question raised in \cite{DU24}. This article mentioned the second approach under situations where iterative methods are used. It is pointed out in \cite[p.1]{DU24} that this approach can be not accurate if the firstly solved system $A\boldsymbol{y}=\boldsymbol{b}$ terminates too early. The question naturally comes that, when should the firstly solved system $A\boldsymbol{y}=\boldsymbol{b}$ and the secondly solved system
+$B\boldsymbol{x}=\boldsymbol{y}$ terminate, such that the accuracy of $AB\boldsymbol{x}=\boldsymbol{b}$ can be controlled? To answer this question, we propose a method to set the stopping criteria based on our theoretical analysis, and verify this method by numerical experiment, which is our main contribution.
+Furthermore, we conduct experimental studies on the three implementing approaches with Krylov subspace methods (refer to \cite{SO23}, \cite{ME20} for details). This type of method is usually used for large and sparse matrices.
+\par
+The remainder of this paper is structured as follows: Section 2 first gives a detailed introduction on the second approach, then offeres a theoretical analysis on the accuracy of this approach. Then, based on the theoretical analysis, we develop our method for setting the stopping criteria, by which the accuracy of solution $\boldsymbol{x}$ is controlled. Section 3 conducts numerical experiments. The first experiment verifies the stopping criteria proposed in Section 2, while the
+second experiment tests the three approaches on large and sparse matrices. Section 4 gives our conclusions.
+\par
+Throughout the paper $\|\cdot \|$ denotes  2-norm, i.e.,  $\|\cdot \|_2$. 
+
+%----------------------------%
+\section{Theoretical analysis on the accuracy of the second approach and a method to control the accuracy }\label{sec:2}
+%----------------------------%
+%----------------------------%
+% \subsection{ORI approach (the first approach)}\label{subsec:ori}
+%----------------------------%
+
+%----------------------------%
+% \subsection{SUB approach (the second approach)}\label{sec:2:sub:2}
+%----------------------------%
+\par
+In this section, we introduce the seconde approach which features splitting linear system \eqref{sec:1:eq:FLS} into two subsystems. After that, we offer a theoretical analysis of the accuracy of this approach, and present our method to control the accuracy of this approach by setting the stopping criteria.
+\par
+The second approach exploits the following equavilent form of \eqref{sec:1:eq:FLS}:
+ \begin{equation}\label{sec:2:eq:SLS}
+    \begin{cases}
+        A\boldsymbol{y}  =\boldsymbol{b},\\
+        B\boldsymbol{x}  =\boldsymbol{y}.
+    \end{cases}
+\end{equation}
+The solution $\boldsymbol{x}$ is obtained by sequentially solving the above two linear subsystems $A\boldsymbol{y}=\boldsymbol{b}$ and $B\boldsymbol{x}=\boldsymbol{y}$. Implementing methods should be combined with a linear solver, take, for example, Krylov subspace methods combined with the second approach. In the example method, Krylov subspace methods are applied first to the subsystem $A\boldsymbol{y}=\boldsymbol{b}$ with stopping criterion $ \alpha_A$, then to the subsystem
+$B\boldsymbol{x}=\boldsymbol{y}$ with stopping criterion $ \alpha_B$. We evaluate the accuracy of the solution $\tilde{\boldsymbol{x}}$ for a linear system $A\boldsymbol{x}=\boldsymbol{b}$ by true relative residual $\varepsilon =
+\frac{\left\|\boldsymbol{b}-A\tilde{\boldsymbol{x}}\right\|}{\left\|\boldsymbol{b}\right\|}$. The solution $\tilde{\boldsymbol{x}}$ could be less accurate if the true relative residual $ \varepsilon$ is larger. 
+\par
+From the definition above, we notice that $\alpha_A$ and  $\alpha_B$ are stopping criteria for the subsystems $A\boldsymbol{y}=\boldsymbol{b}$ and $B\boldsymbol{x}=\boldsymbol{y}$, instead of linear system \eqref{sec:1:eq:FLS}. It is worth considering the relation between the accuracies of the two subsystems \eqref{sec:2:eq:SLS} and the accuracy of linear system \eqref{sec:1:eq:FLS}.
+The following theorem discusses the relation.
+\par
+\begin{thm}\label{thm:main}
+    Let $\tilde{\boldsymbol{y}}$ be an approximation to the accurate solution $\boldsymbol{y}$ of
+    $A\boldsymbol{y}=\boldsymbol{b}$, and $\tilde{\boldsymbol{x}} $ be an approximation to the accurate solution $\boldsymbol{x}$ of $B\boldsymbol{x}=\tilde{\boldsymbol{y}}$. Then the true relative residual $\varepsilon = \frac{\left\|\boldsymbol{b}-AB
+            \tilde{\boldsymbol{x}}\right\|}{\left\|\boldsymbol{b}\right\|}
+$ of solution $\tilde{\boldsymbol{x}}$ for \eqref{sec:1:eq:FLS} can be bounded by the following inequalities:
+    %
+    \begin{equation}\label{sec:2:eq:EA}
+        \begin{aligned}
+                    \frac{\left\|\boldsymbol{b}-AB \tilde{\boldsymbol{x}}\right\|}     
+            {\left\|\boldsymbol{b}\right\|}
+            &\leq 
+            \kappa(A)\frac{\left\|\tilde{\boldsymbol{y}}-B
+            \tilde{\boldsymbol{x}}\right\|}{\left\|\tilde{\boldsymbol{y}}\right\|}
+            \frac{\left\|A\tilde{\boldsymbol{y}}\right\|}
+            {\left\|\boldsymbol{b}\right\|}
+            + \frac{\left\|\boldsymbol{b}-A
+            \tilde{\boldsymbol{y}}\right\|}{\left\|\boldsymbol{b}\right\|}
+            %\label{sec:2:eq:lls}
+            .\\
+        \end{aligned}
+%                %.
+    \end{equation}
+
+\begin{proof}
+    From triangular inequality $\left\|\boldsymbol{b}-AB\tilde{\boldsymbol{x}}\right\| \leq 
+    \left\|\boldsymbol{b}-A\tilde{\boldsymbol{y}}\right\|+\left\|A(\tilde{\boldsymbol{y}}-B\tilde{\boldsymbol{x}})\right\|$, we easily prove the first inequality. For the second inequality, let $\sigma_{\min}$ and $\sigma_{\max}$ be the smallest and largest singular values of $A$, respectively. For any $\boldsymbol{y}\in \mathbb{R}^N$, we have:
+    \[
+    \sigma_{\min}\left\|\boldsymbol{y}\right\|\leq\left\|A\boldsymbol{y}\right\|
+    \leq \sigma_{\max}\left\|\boldsymbol{y}\right\|
+    ,\] 
+    then $\frac{\left\|A(\tilde{\boldsymbol{y}}-
+    B\tilde{\boldsymbol{x}})\right\|}{\left\|A\tilde{\boldsymbol{y}}\right\|}
+    \leq \frac{\sigma_{\max}}{\sigma_{\min}}
+    \frac{\left\|\tilde{\boldsymbol{y}}- B\tilde{\boldsymbol{x}}\right\|}
+    {\left\|\tilde{\boldsymbol{y}}\right\|}.$ Notice $ \kappa(A) = 
+    \frac{\sigma_{\max}}{\sigma_{\min}}
+    $, the second inequality is thus proved.
+\end{proof}
+\end{thm}
+
+The following two corollaries discuss special cases of inequality \eqref{sec:2:eq:EA} under given conditions, by which we develop the method for setting the stopping criteria $\alpha_A$, $\alpha_B$ to achieve controlled accuracy.
+
+\par
+
+\begin{col}\label{col:1}Let $ \varepsilon_A=\frac{\left\|\boldsymbol{b}-A
+            \tilde{\boldsymbol{y}}\right\|}{\left\|\boldsymbol{b}\right\|}
+$ be the true relative residual of solution $\tilde{\boldsymbol{y}}$ for $A\boldsymbol{y}=\boldsymbol{b}$. For any $\delta >0$, when $\varepsilon_A \leq \delta$, then $\left| \frac{\|A\tilde{\boldsymbol{y}}\|}{\|\boldsymbol{b}\|} -1 \right| \leq \delta$, thus $\frac{\left\|A\tilde{\boldsymbol{y}}\right\|}{\left\|\boldsymbol{b}\right\|} \leq 1+\delta$, the inequality \eqref{sec:2:eq:EA} becomes:
+    \begin{equation}\label{sec2:eq:EB}
+        \begin{aligned}
+                    \frac{\left\|\boldsymbol{b}-AB \tilde{\boldsymbol{x}}\right\|}     
+            {\left\|\boldsymbol{b}\right\|}& 
+            &\leq
+            \kappa(A)(1+\delta)\frac{\left\|\tilde{\boldsymbol{y}}-B
+            \tilde{\boldsymbol{x}}\right\|}{\left\|\tilde{\boldsymbol{y}}\right\|}
+            + \frac{\left\|\boldsymbol{b}-A
+            \tilde{\boldsymbol{y}}\right\|}{\left\|\boldsymbol{b}\right\|}
+            %\label{Sec2:eq:lls}
+            .\\
+        \end{aligned}
+%                %.
+    \end{equation}
+    \begin{proof}
+        From triangular inequality, $1-\frac{\left\|A\tilde{\boldsymbol{y}}\right\|}{\left\|\boldsymbol{b}\right\|} \leq \varepsilon_A $, $\frac{\left\|A\tilde{\boldsymbol{y}}\right\|}{\left\|\boldsymbol{b}\right\|}-1 \leq \varepsilon_A $, thus $\left| \frac{\|A\tilde{\boldsymbol{y}}\|}{\|\boldsymbol{b}\|} -1 \right| \leq \varepsilon_A \leq \delta$.
+    \end{proof}
+\end{col}
+\par
+In Corollary \ref{col:1}, we analyse the value of $\frac{\left\|A\tilde{\boldsymbol{y}}\right\|}{\left\|\boldsymbol{b}\right\|}$ and discover that as  $\varepsilon_A$ decreases, $\frac{\left\|A\tilde{\boldsymbol{y}}\right\|}{\left\|\boldsymbol{b}\right\|}$  can be arbitrarily close to 1. Based on the analysis, we can bound the true relative residual $\varepsilon
+\leq \alpha$ by the true relative residuals of the subsystems in the following corollary.
+\par
+\begin{col}\label{col:2}
+    Let $\varepsilon_B=\frac{\left\|\tilde{\boldsymbol{y}}-B
+            \tilde{\boldsymbol{x}}\right\|}{\left\|\tilde{\boldsymbol{y}}\right\|}
+$ be the true relative residual of solution $\tilde{\boldsymbol{x}}$ for $B\boldsymbol{x}=\tilde{\boldsymbol{y}}$. Assume $\delta > 0$ and  $\varepsilon_A \leq \delta$. For any $\alpha > 0$, if $ \varepsilon_A \leq \frac{\alpha}{2}, \varepsilon_B \leq \frac{ \alpha}{2(1+\delta)\kappa(A)} $, then $\varepsilon \leq \alpha$. In real computations, when $\tilde{\boldsymbol{y}}$ is a good approximation for $A\boldsymbol{y}=\boldsymbol{b}$, normally $\varepsilon_A\ll 1$, thus it can be assumed that
+$\delta=1$. If $ \varepsilon_A \leq \frac{\alpha}{2}, \varepsilon_B \leq \frac{ \alpha}{4\kappa(A)} $, then $\varepsilon \leq \alpha$.
+
+\begin{proof}
+    From Corollary \ref{col:1}, $ \varepsilon \leq \kappa(A)(1+\delta) \varepsilon_B + \varepsilon_A$. It is assumed $ \varepsilon_A \leq \frac{\alpha}{2}, \varepsilon_B \leq \frac{ \alpha}{2(1+\delta)\kappa(A)} $, thus $\kappa(A)(1+\delta) \varepsilon_B + \varepsilon_A \leq \alpha$, then $ \varepsilon \leq \alpha$.
+\end{proof}
+\end{col}
+    \par
+    From the analysis in Corollary \ref{col:2}, it is reasonable if we set stopping criteria  $ \varepsilon_A \leq \frac{\alpha}{2}, \varepsilon_B \leq \frac{ \alpha}{4\kappa(A)} $ to control the accuracy, such that the true relative residual $\varepsilon \leq \alpha$, $\alpha$ is the given accuracy. As an application, we have developed our method to control the accuracy of the second approach by setting the stopping criteria $ \varepsilon_A \leq \frac{\alpha}{2}, \varepsilon_B \leq \frac{ \alpha}{4\kappa(A)} $. This method is summarized as the algotirhm \ref{alg:cg} below.
+
+\begin{algorithm}
+\caption{Solve linear system \eqref{sec:1:eq:FLS} by
+    the separated approach}\label{alg:cg}
+\begin{algorithmic}
+\Require $A, B \in \mathbb{C}^{n \times n}, \bm{b} \in
+      \mathbb{C}^n$, tolerance $\epsilon_{\text{tol}}$ for \eqref{sec:1:eq:FLS}
+      \Ensure approximated solution $\bm{z}_m$ for linear
+      system \eqref{sec:1:eq:FLS} s.t. $\| \bm{b}- \mathit{AB}
+      \bm{z}_m \| \leq \epsilon_{\text{tol}} \| \bm{b} \|$.
+      \State \textbf{Step 0}
+      \State  $\epsilon_A = \frac{\epsilon_{\text{tol}}}{2}$, $\epsilon_B = \frac{\epsilon_{\text{tol}}}{(2 +
+        \epsilon_{\text{tol}}) \kappa (A)}$
+      \State \textbf{Step 1}
+      \State Apply an iterative method to $A\bm{y}=\bm{b}$ to get $\bm{y}_m$ such that $\| \bm{b}- A\bm{y}_m
+      \| \leq \epsilon_A \| \bm{b} \|$
+      \State \textbf{Step 2}
+      \State Apply an iterative method to $B\bm{z}=\bm{y}_m$ to get $\bm{z}_m$ such that $\| \bm{y}_m -
+          B\bm{z}_m \| \leq \epsilon_B \| \bm{y}_m \|$
+\end{algorithmic}
+\end{algorithm}

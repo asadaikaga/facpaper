@@ -1,5 +1,15 @@
 = index of this paper =
 
+- [[a minimalist example]]
+- In what do I want to print the result? How do I want the layout?
+= Comment from zhang =
+- Do not use random sparse matrix, use toeplitz matrix
+- First try that will be nice. Then decide if you want a script
+- Or I can write just in julia
+- [[a structured output format]]
+= conclusion =
+The only way that works are preconditioning
+Comment: a different R will not work for reducing the condition number, and a sparse random matrix will also not do this way.
 == A first draft of presentations ==
 This have been done in main.tex
 And this version have received several advices.

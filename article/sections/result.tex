@@ -1,0 +1,72 @@
+%----------------------------%
+\section{Numerical Experiments}\label{sec:abbr}
+%----------------------------%
+
+In this section, the results of two experiments are presented. The first experiment examines the stopping criteria proposed in Section 2 with one example. The second experiment tests the three approaches with multiple problems on large and sparse matrices.
+\par
+
+Our experimental problems tests the three approaches on linear system $A^\top A\boldsymbol{x}=\boldsymbol{b}$, which comes from computing the singular value of the least
+norm. To get the least singular value of $A$, we apply inverse iterations on $A^{\top}A$, whose most time-consuming part is solving linear system $A^{\top}A\boldsymbol{x}=\boldsymbol{b}$. To solve the linear system $A^TA\boldsymbol{x}=\boldsymbol{b}$, the three approaches are combined with a representative of Krylov subspace methods, GPBi-CG \cite{ZH97}. The problems are tested by MATLAB 2024b on one 8GB Apple M2 CPU from macOS Sequoia 15.3.1
+operating system. 
+\subsection{Verifying the proposed stopping criteria}
+To verify the stopping criteria proposed in the previous section, we use a matrix $A$ descretized from convection-diffusion-reaction problem by central difference method and observe the true relative residual by setting up the stopping criteria. The matrix is introduced in the authors' Github repository\footnote{Zhixuan Xu, Test Matrices in Numerical Experiments, Krylov Product Project (GitHub), accessed July 4, 2025, https://github.com/zhixuan-xu/krylov-product/blob/main/Exp1/matrices.md.}.
+\par
+The result of the first experiment is listed in Table \ref{tab:res}. Considering the condition number $\kappa(A^\top)= 208$, if we take the controlled accuracy $ \alpha = 1 \times  10^{-6}$ as an example, stopping criteria $ \alpha_A = 5.00 \times 10^{-7} = \frac{\alpha}{2} , \alpha_B = 1.20 \times  10^{-9} = \frac{ \alpha}{4\kappa(A^\top)} $ should be set. The result shows the true relative residual $ \varepsilon$ is less than the controlled accuracy $\alpha$ for all cases, which indicates the validity of our proposed stopping criteria $\alpha_A,\alpha_B$.
+\par
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{c c c c c}
+        \toprule
+        Controlled accuracy $\alpha$  & $\alpha_A$ & $\alpha_B$ & True relative residual $\varepsilon$\\
+        \midrule
+        $ 1.00 \times 10^{-6}$ & $5.00 \times 10^{-7}$ & $1.20 \times 10^{-9}$ &  $3.24 \times 10^{-10}$\\
+        $ 1.00 \times 10^{-7}$ & $5.00 \times 10^{-8}$ & $1.20 \times 10^{-10}$ &  $4.87 \times 10^{-11}$\\
+        $ 1.00 \times 10^{-8}$ & $5.00 \times 10^{-9}$ & $1.20 \times 10^{-11}$ &  $9.58 \times 10^{-12}$\\
+        $ 1.00 \times 10^{-9}$ & $5.00 \times 10^{-10}$ & $1.20 \times 10^{-12}$ &  $7.57 \times 10^{-13}$\\
+        \bottomrule
+    \end{tabular}
+    \caption{True relative residual  $ \varepsilon $ after applying the stopping criteria proposed in Section 2. $\kappa(A^\top)$ is the estimated condition number of $A^\top$. In this experiment, $\kappa(A^\top)=208$. $\alpha_A, \alpha_B$ are stopping criteria proposed in Section 2, and $\varepsilon$ is the true relative residual of linear system $A^\top A\boldsymbol{x}=\boldsymbol{b}$, which indicates the accuracy of the second approach.}
+    \label{tab:res}
+\end{table}
+\subsection{Comparing three approaches}
+\par
+In this experiment, we aim to numerically test the three approaches and compare them. The second experiment tests 50 matrices $A$ from SuiteSparse matrix collections \cite{TI11} and compares the CPU time, iterations and true relative residual for all the three approaches. The sources of matrices vary from structural problem, model reduction problem, optimal control problem and computational fluid dynamics problem, and the names of test matrices are listed on the authors' GitHub repository\footnote{Zhixuan Xu, Test Matrices in Numerical Experiments, Krylov Product Project (GitHub), accessed July 4, 2025, https://github.com/zhixuan-xu/krylov-product/blob/main/Exp1/matrices.md.}.
+The experimental results of CPU time, number of iterations and true relative residual are illustrated in Figs. \ref{fig:CPU_1}, \ref{fig:iter_1}, \ref{fig:res_1}, respectively.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./image/CPU_ORISUBAUG.png}
+    \caption{CPU time (s) for solving $A^{\top}A\boldsymbol{x}=\boldsymbol{b}$ }
+    \label{fig:CPU_1}
+\end{figure}
+
+Then we analyse the all the three figures. In Fig. \ref{fig:CPU_1}, when CPU time is compared, the second approach is the fastest for 31 cases out of all 50 problems, while the first approach is the fastest for 18 cases. The first approach only outperfroms in 1 case. The second approach is the fastest for more cases. In Fig. \ref{fig:iter_1}, considering the number of iterations, the first approach only fails 1 time, while the second approach fails 14 times (either
+$A\boldsymbol{y}=\boldsymbol{b}$ or $B\boldsymbol{x}=\boldsymbol{y}$ fails). The third approach fails most of the time. In Fig. \ref{fig:res_1}, considering the true relative residual, the first approach has only 1 case with relative residual more than $1 \times 10^5$, and the second approach has 9 cases whose relative residuals are more than $1\times 10^{-5}$.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./image/iters_ORISUBAUG.png}
+    \caption{Number of iterations for solving
+    $A^{\top}A\boldsymbol{x}=\boldsymbol{b}$. For the first approach and the third approach, maximum iteration is 5000. The second approach consists of solving 2 linear systems, and each system has maximum iteration 5000.}
+    \label{fig:iter_1}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./image/tres_ORISUBAUG.png}
+    \caption{True relative residual (refer to Section 2 for the definition)
+    for solving $A^{\top}A\boldsymbol{x}=\boldsymbol{b}$. The controlled accuracy for the first approach and the third approach are $10^{-6}$. For the second approach, the controlled accuracy for each system is $10^{-6}$.} 
+\label{fig:res_1}
+\end{figure}
+
+In a nutshell, we have confirmed that the first approach is stable but
+requires longer time when the linear system is of the form
+$A^{\top}A\boldsymbol{x}=\boldsymbol{b}$. The second approach sometimes doesn't converge and is less accurate, but is most likely to perform fast among the three approachs. The third approach is neither stable nor accurate. We do not recommend this approach as
+far as we have tested.
+\clearpage
+%----------------------------%
+\section{Conclusions}\label{sec:con}
+%----------------------------%
+We have presented the three approaches for solving linear system \eqref{sec:1:eq:FLS}, and stated a question from \cite[p.1]{DU24} about the accuracy of the second approach. To answer the question, we have conducted theoretical analysis to the second approach and and proposed stopping cirteria for controlling the accuracy.
+In our first experiment, we illustrated the validity of the stopping criteria from one example. In our second experiment, we tested the three approaches on a wide range of large and sparse matrices and gave our conclusions on the charasteristics for each approach.

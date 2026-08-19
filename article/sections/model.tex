@@ -1,0 +1,57 @@
+\section{Our model problem and numerical experiments}
+
+Two class of toeplitz matrices are used for analysing. They can be expressed in the following structures.
+The first class of toeplitz matrices has diagonal entries of value $2$, and subdiagonals of value $1$ and $\gamma$ at position $1$ and $-2$, respectively. They are mathematically written as the form $\mathcal{A}$ in \eqref{toemat}.
+The second class of toeplitz matrices has the same diagonal entries as the first class of matrices. However, the subdiagonals are of value $-1$ and $\delta$ at position $1$ and $-2$, respectively. They are mathematically written as the form $\mathcal{B}$ in \eqref{toemat}.
+
+\begin{equation}\label{toemat}
+	\mathcal{A}: \mqty{
+	2 & 1& & & & \\
+	0& 2& 1& & & \\
+	\gamma&0 & 2& 1& & \\
+	& \ddots&\ddots & \ddots& \ddots& \\
+	& & \gamma&0 & 2& 1\\
+	& & & \gamma& 0& 2
+},
+\quad
+\mathcal{B}:
+\mqty{
+	2 & -1& & & & \\
+	0& 2& -1& & & \\
+	\delta&0 & 2& -1& & \\
+	& \ddots&\ddots & \ddots& \ddots& \\
+	& & \delta&0 & 2& -1\\
+	& & & \delta& 0& 2
+}
+.
+\end{equation}
+
+The behavior of Krylov subspace methods on problem $\mathcal{A}$ and problem $\mathcal{B}$ can be divided into three categories.
+
+The model problem is chosen for the following reasons. First, the behaviour of Krylov subspace methods is very complicated on different types of problems.
+
+The condition number and the corresponding convergence result of the a toeplitz matrix
+
+Please follow a table later. And the code could be implemented. This is just the start of the article. Later you are going to find more about the matrices.
+
+There are also relationship that could be considered.
+\begin{equation}
+\mqty{
+	2 & 1& & & & \\
+	0& 2& 1& & & \\
+	\gamma&0 & 2& 1& & \\
+	& \ddots&\ddots & \ddots& \ddots& \\
+	& & \gamma&0 & 2& 1\\
+	& & & \gamma& 0& 2
+}
+\mqty{
+	2 & -1& & & & \\
+	0& 2& -1& & & \\
+	\delta&0 & 2& -1& & \\
+	& \ddots&\ddots & \ddots& \ddots& \\
+	& & \delta&0 & 2& -1\\
+	& & & \delta& 0& 2
+}
+.
+\end{equation}
+

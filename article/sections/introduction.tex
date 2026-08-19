@@ -1,0 +1,22 @@
+\section{Introduction}
+In this paper, we consider numerical methods for solving a linear system in the form $AB \bm{x} = \bm{b}$.
+This problem is a special case for $A \bm{x} = \bm{b}$, thus we consider three types of methods, direct methods, stationary iterative methods, and Krylov subspace methods.
+Each method should be specially treated to make best use of the matrix product structure $AB$.
+
+To apply direct methods, the linear equation ${L}_{A} {U}_{A} {L}_{B} {U}_{B} \bm{x} = \bm{b}$ is exploited
+after decomposing each of $A , B$ into lower triangular matrix ${L}$ and upper triangular matrix ${U}$.
+After solving four triangular systems, the solution $\bm{x}$ is acquired.
+To apply stationary iterative methods, we first solve the linear system $A \bm{y} = \bm{b}$, then solve the linear system $B \bm{x} = \tilde{\bm{y}}$ using the aomputed approximation $\tilde{\bm{y}}$.
+To apply Krylov subspace methods, we have two different approaches. The first approach is similar to the approach when applying stationaty iterative methods; The second approach computes at each iterate the matrix-vector product $AB\bm{p}$ in the order $A (B\bm{p})$.
+By now, we have two approaches for solving a linear system $AB \bm{x} = \bm{b}$. The separate method. The combined method. The combined method can only be implemented when Krylov subspave methods are applied.
+
+We take special interest in the following case.
+
+And these phenomenon is not analysed into details, thus we cannot arrive a conclusion at which method should be used at which circumstance.
+
+However what is the main motivation? I guess it is still not clear. The main motivation. It is not "because we need a method" but should be "somehow what problem attracts our attention".
+
+It is a simple idea thus what about, an example that separate method works extremely slow but the other one is very fast?
+
+It is not about structural but how the operates are affected accross themselves.
+

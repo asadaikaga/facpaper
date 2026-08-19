@@ -1,0 +1,43 @@
+% Declare this file as a package
+\ProvidesPackage{nlaex}
+
+\usepackage{amssymb,amsmath,amsfonts,amscd}
+% The hyperref package in LaTeX enhances documents by adding hyperlinks and improving cross-referencing.
+\usepackage{hyperref}
+\usepackage{graphicx}  % 插入图片
+\usepackage{xcolor}    % 定义颜色
+\usepackage{bm} % For easy boldsymbol input
+\usepackage{mathtools} % For input coloneq
+\usepackage{float}
+% \usepackage{biblatex}
+% The algorithm package provides a floating environment for algorithms, similar to figures and tables, allowing for captions and referencing.
+% The algpseudocode package offers a structured way to write pseudocode, using indentation and control structures (like If-Else, For, and While) to improve readability.
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+%% The amsthm package provides extended theorem environments
+% Theorem environment
+\usepackage{amsthm}
+\newtheorem{thm}{Theorem}
+\newtheorem{col}{Corollary}
+\newtheorem{dee}{Definition}
+\newtheorem{exe}{Exercise}
+\newtheorem{exm}{Example}
+\newtheorem{lem}{Lemma}
+\newtheorem{pro}{Proposition}
+%% This enables splitting tex source code into several input files.
+% \usepackage{subfiles}
+%To write table with better structure
+\usepackage{booktabs}
+\newcommand{\mqty}[1]{\begin{bmatrix}#1\end{bmatrix}}
+%%
+%% iterative methods superscripts
+\newcommand{\bcg}{\mathrm{bicg}}
+\newcommand{\cgs}{\mathrm{cgs}}
+\newcommand{\stb}{\mathrm{stab}}
+% Custom settings
+% \setlength{\parindent}{0pt}   % 段落首行缩进
+% \setlength{\parskip}{1em}     % 段落间距
+% Subfigures
+\usepackage{subcaption}
