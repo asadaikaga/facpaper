@@ -36,6 +36,7 @@
   \smallskip
 }
 \usepackage{listings}
+\usepackage{caption}
 
 % Title page details: 
 \title{On two numerical approaches for linear systems $AB \bm{x} = \bm{b}$} 
@@ -140,7 +141,7 @@ krylov $A \bm{y} = \bm{b}$ $|$ krylov $B \bm{x} = \bm{y}$ & gmres $A \bm{y} = \b
 		\item \textit{Implicit formulation}: matrix-vector product $\underbracket{A(B \bm{b})}_{\text{Krylov}} \rightarrow O(n)$
 	\end{itemize}
 \end{block}
-\begin{block}{Warning (Krylov subspce methods):}
+\begin{alertblock}{Warning (Krylov subspce methods):}
 	\vspace{1pt}
 	Memory $\rightarrow$ Sparsity 
 $\xrightarrow{\text{specifically}}$ Sparsity of $AB$\\
@@ -149,7 +150,7 @@ $\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
 	\vspace{0.5em}
 	Number of iterations $\rightarrow$ \underline{Condition}
 	$\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
-\end{block}
+\end{alertblock}
 % The direct combined approach is worth considering (in computational cost) when \textcolor{red}{Krylov subspace method} is applied.
 \end{frame}
 
@@ -166,7 +167,6 @@ $\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
 	\begin{enumerate}
 		\item[Q1:] rules for setting up solvers in \textit{the separate approach}
 		\item[Q2:] conditions when \textit{the combined approach} is a good choice \& those when \textit{the separate approach} is a good choice
-		\item[Q3:] what will happen if preconditioned algorithms are applied?
 	\end{enumerate}
 	\end{block}
 	\begin{alertblock}{To answer the questions}
@@ -258,185 +258,198 @@ $\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
 		\text{relative residual \textit{(rel. res.)}} = \cfrac{\|\bm{b} - A B \bm{x}\|}{\|\bm{b}\|} \leq \varepsilon_{tol}
 	.
 	\end{equation}
-	However, our setting:
+	\sout{However}, our setting:
 
 	\begin{minipage}{0.63\textwidth}	
-	\begin{block}{The separate method}
-		\begin{equation*}
-			\underbracket{\text{Krylov}}_{\epsilon_1 = \varepsilon_{tol}} \text{ } A \bm{y} = \bm{b} \text{ }| \text{ } \underbracket{\text{Krylov}}_{\varepsilon_2 = \varepsilon_{tol}} \text{ } B \bm{x} = \bm{y}\xrightarrow{\text{leads to}} \textit{rel. res.} \leq \varepsilon_{tol}
-		\end{equation*}	
-	\end{block}
 	\begin{block}{The combined method}
 		\begin{equation*}
 			\underbracket{\text{Krylov}}_{\varepsilon_{c} = \varepsilon_{tol}} \text{ } AB \bm{x} = \bm{b}\xrightarrow{\text{leads to}} \textit{rel. res.} \leq \varepsilon_{tol}
 		\end{equation*}		
+	\end{block}
+	\begin{block}{The separate method}
+		\begin{equation*}
+			\underbracket{\text{Krylov}}_{\epsilon_1 = \varepsilon_{tol}} \text{ } A \bm{y} = \bm{b} \text{ }| \text{ } \underbracket{\text{Krylov}}_{\varepsilon_2 = \varepsilon_{tol}} \text{ } B \bm{x} = \bm{y}\xrightarrow{\alert{\text{leads to??}}}  \hbox{\sout{$\textit{rel. res.} \leq \varepsilon_{tol}$}}
+		\end{equation*}	
 	\end{block}
 	\end{minipage}%
 	\hfill
 	\begin{minipage}{0.33\textwidth}	
 		\begin{alertblock}{A properly defined stopping criteria?}
 			\vspace{1em}
-			Some sentences			
+			\sout{A theoretical result saying: you can be that accurate if you do as told}
 		\end{alertblock}
 	\end{minipage}
 \end{frame}
 \begin{frame}{Model Problem \textit{(Toeplitz)}, case 1}
-	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat})
+	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat}), and their condition numbers
 
 	\begin{minipage}[t]{0.63\textwidth}
 		\vspace{0pt}
+		\centering
 		\begin{tabular}{l c c}
 			\toprule
 			Method & CPU(s) & true rel. res.\\
 			\midrule
 			Separate& $9.94 \times 10^{-4}$ & $8.98 \times 10^{-5}$ \\
-			Combined& $6.47 \times 10^{-4}$& $6.58 \times 10^{-5}$\\
+			Combined& \underline{$6.47 \times 10^{-4}$} & \underline{$6.58 \times 10^{-5}$}\\
 			\bottomrule
 		\end{tabular}
+		\captionof{table}{Numerical comparison of two approaches. For stopping criteria, \textit{separate}: $\varepsilon_{1} = \varepsilon_{tol}, \varepsilon_{2} = \varepsilon_{tol}$; \textit{combined}: $\varepsilon_{c} = \varepsilon_{tol}$. Here $\varepsilon_{tol} = 1 \times 10^{-4}$, all solvers are Bi-CGSTAB.}
 	\end{minipage}%
 	\hfill
 	\begin{minipage}[t]{0.33\textwidth}
 		\vspace{0pt}
 		$\mathrm{cond} (A) \approx 2.25 $\\
 		$\mathrm{cond} (B) \approx 2.25$\\
-		$\mathrm{cond} (AB) \approx 1.95$
+		\underline{$\mathrm{cond} (AB) \approx 1.95$}
 	\end{minipage}
 
-	\begin{block}{Conclusions:}
-		\vspace{0pt}
-		$\mathrm{cond} (AB) \leq \min\{ \mathrm{cond}(A) \mathrm{cond} (B)\}$
-	\end{block}
+	\begin{itemize}
+		\item $AB$ \underline{best} condition $\rightarrow$ \textit{Combined} \underline{best} performance
+	\end{itemize}
 \end{frame}
 
 \begin{frame}{Model Problem \textit{(Toeplitz)}, case 2}
-	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat})
+	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat}), and their condition numbers
 
 	\begin{minipage}[t]{0.63\textwidth}
 		\vspace{0pt}
+		\centering
 		\begin{tabular}{l c c}
 			\toprule
 			Method & CPU(s) & true rel. res.\\
 			\midrule
-			Separate& $2.22 \times 10^{-3}$ & $1.32 \times 10^{-4}$ \\
-			Combined& $1.10 \times 10^{-3}$& $7.70 \times 10^{-5}$\\
+			Separate& $2.22 \times 10^{-3}$ & \alert{$1.32 \times 10^{-4}$} \\
+			Combined& \underline{$1.10 \times 10^{-3}$}& \underline{$7.70 \times 10^{-5}$}\\
 			\bottomrule
 		\end{tabular}
+		\captionof{table}{Numerical comparison of two approaches. For stopping criteria, \textit{separate}: $\varepsilon_{1} = \varepsilon_{tol}, \varepsilon_{2} = \varepsilon_{tol}$; \textit{combined}: $\varepsilon_{c} = \varepsilon_{tol}$. Here $\varepsilon_{tol} = 1 \times 10^{-4}$, all solvers are Bi-CGSTAB }
 	\end{minipage}%
 	\hfill
 	\begin{minipage}[t]{0.33\textwidth}
 		\vspace{0pt}
 		$\mathrm{cond} (A) \approx 334.82 $\\
-		$\mathrm{cond} (B) \approx 2.88$\\
-		$\mathrm{cond} (AB) \approx 168.67$
+		\underline{$\mathrm{cond} (B) \approx 2.88$}\\
+		\uuline{$\mathrm{cond} (AB) \approx 168.67$}
 	\end{minipage}
 
-	\begin{block}{Conclusions:}
-		\vspace{0pt}
-	\end{block}
+	\begin{itemize}
+		\item $AB$ \uuline{second best} condition $\rightarrow$ \textit{Combined} \underline{best} performance
+	\end{itemize}
 \end{frame}
 
 \begin{frame}{Model Problem \textit{(Toeplitz)}, case 3}
-	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat})
+	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat}), and their condition numbers
 
 	\begin{minipage}[t]{0.63\textwidth}
 		\vspace{0pt}
+		\centering
 		\begin{tabular}{l c c}
 			\toprule
 			Method & CPU(s) & true rel. res.\\
 			\midrule
-			Separate& $1.82 \times 10^{-3}$ & $1.28 \times 10^{-4}$ \\
-			Combined& $1.10 \times 10^{-3}$& $7.70 \times 10^{-5}$\\
+			Separate& $1.82 \times 10^{-3}$ & \alert{$1.28 \times 10^{-4}$} \\
+			Combined& \underline{$1.10 \times 10^{-3}$}& \underline{$7.70 \times 10^{-5}$}\\
 			\bottomrule
 		\end{tabular}
+		\captionof{table}{Numerical comparison of two approaches. For stopping criteria, \textit{separate}: $\varepsilon_{1} = \varepsilon_{tol}, \varepsilon_{2} = \varepsilon_{tol}$; \textit{combined}: $\varepsilon_{c} = \varepsilon_{tol}$. Here $\varepsilon_{tol} = 1 \times 10^{-4}$, all solvers are Bi-CGSTAB. }
 	\end{minipage}%
 	\hfill
 	\begin{minipage}[t]{0.33\textwidth}
 		\vspace{0pt}
-		$\mathrm{cond} (A) \approx 2.88 $\\
+		\underline{$\mathrm{cond} (A) \approx 2.88 $}\\
 		$\mathrm{cond} (B) \approx 334.82$\\
-		$\mathrm{cond} (AB) \approx 168.67$
+		\uuline{$\mathrm{cond} (AB) \approx 168.67$}
 	\end{minipage}
 
-	\begin{block}{Conclusions:}
-		\vspace{0pt}
-		This is the conclusion	
-	\end{block}
+	\begin{itemize}
+		\item $AB$ \uuline{second best} condition $\rightarrow$ \textit{Combined} \underline{best} performance
+	\end{itemize}
 \end{frame}
 
 \begin{frame}{Model Problem \textit{(Toeplitz)}, case 4}
-	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat})
+	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat}), and their condition numbers
 
 	\begin{minipage}[t]{0.63\textwidth}
 		\vspace{0pt}
+		\centering
 		\begin{tabular}{l c c}
 			\toprule
 			Method & CPU(s) & true rel. res.\\
 			\midrule
-			Separate& $1.96 \times 10^{-3}$ & $9.95 \times 10^{-5}$ \\
-			Combined& $2.61 \times 10^{-3}$& $8.66 \times 10^{-5}$\\
+			Separate& \underline{$1.96 \times 10^{-3}$} & $9.95 \times 10^{-5}$ \\
+			Combined& $2.61 \times 10^{-3}$& \underline{$8.66 \times 10^{-5}$}\\
 			\bottomrule
 		\end{tabular}
+		\captionof{table}{Numerical comparison of two approaches. For stopping criteria, \textit{separate}: $\varepsilon_{1} = \varepsilon_{tol}, \varepsilon_{2} = \varepsilon_{tol}$; \textit{combined}: $\varepsilon_{c} = \varepsilon_{tol}$. Here $\varepsilon_{tol} = 1 \times 10^{-4}$, all solvers are Bi-CGSTAB. }
 	\end{minipage}%
 	\hfill
 	\begin{minipage}[t]{0.33\textwidth}
 		\vspace{0pt}
-		$\mathrm{cond} (A) \approx 2.66 $\\
-		$\mathrm{cond} (B) \approx 33.98$\\
+		\underline{$\mathrm{cond} (A) \approx 2.66 $}\\
+		\uuline{$\mathrm{cond} (B) \approx 33.98$}\\
 		$\mathrm{cond} (AB) \approx 47.86$
 	\end{minipage}
 
-	\begin{block}{Conclusions:}
+	\begin{itemize}
+		\item $A,B$ \underline{best} condition $\rightarrow$ \textit{Seperate} \underline{best} performance
+	\end{itemize}
+\end{frame}
+\begin{frame}{Summary on the model problem}
+	\begin{enumerate}
+		\item A good condition of $AB$ generally leads to better performance of \textit{the combined approach} (less CPU time)
+		\item \textit{The separate approach} with stopping criteria $\varepsilon_{1} = \varepsilon_{tol}, \varepsilon_{2} = \varepsilon_{tol}$ risks accuracy loss $\rightarrow$ a different setting, $\varepsilon_{1} = \alert{?}, \varepsilon_{2} = \alert{?}$
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}{Toward a possible proper stopping criteria: our theorem}
+	\begin{thm}[Relative residual of the separate approach]
 		\vspace{0pt}
-		This is the conclusion	
-	\end{block}
-\end{frame}
-\begin{frame}{Summary}
-	\begin{block}{Model Problem, case 1}
-		\vspace{1pt}
-		The case
-	\end{block}
-	\begin{block}{Model Problem, case 2}
-		\vspace{1pt}
-		The case
-	\end{block}	
-\end{frame}
-
-\begin{frame}{Theorem}
-	The theorem? In mathematics.
+		Consider matrices $A , B , C \in \mathbb{C}^{n \times n}$, vectors $\bm{y}, \bm{b}, \bm{x}, \bm{r}_{A}, \bm{r}_{B} \in \mathbb{C}^{n}$ ($C = AB$, $\bm{b} \neq \bm{0}$), of which the following relations are satisfied:
+		\begin{align*}
+			A\bm{y} & = \bm{b} + \bm{r}_{A}, \quad (\varepsilon_{A} = \frac{\|\bm{r}_{A}\|}{\|\bm{b}\|}) \\
+			B \bm{x} & = \bm{y} + \bm{r}_{B}, \quad (\varepsilon_{A} = \frac{\|\bm{r}_{A}\|}{\|\bm{b}\|})
+		\end{align*}
+	then we have the following inequatlity:
+	\begin{equation}
+	\frac{\|\bm{b} - AB \bm{x}\|}{\|\bm{b}\|} \leq \kappa(A) \varepsilon_{B} ( 1 + \varepsilon_{A} ) + \varepsilon_{A}	
+	.
+	\end{equation}
+	\end{thm}
 \end{frame}
 
-\section{Numerical Experiment}
-\begin{frame}{On setting up proper stopping criteria}
-	case	
-\end{frame}
-
-\begin{frame}{Numerical experiment: comparison of two approaches}
-	case
+\begin{frame}{Toward a possible proper stopping criteria: the proof and example}
+	\begin{proof}
+		See Appendices	
+	\end{proof}	
+	\begin{exm}[Relations to \textit{the separate approach}]
+		\vspace{0pt}
+		Consider our separate approach:	Solve $A \bm{y} = \bm{b}$ $|$ Solve $B \bm{x} = \bm{y}$. Let $\bm{y}$ be the output after solving $A \bm{y} = \bm{b}$, and $x$ be the output after solving $B \bm{x} = \bm{y}$. Residuals $\bm{r}_{A}, \bm{r}_{B}$ represent the inaccuracy of the approximated solution $\bm{y}, \bm{x}$. $\varepsilon_{A}, \varepsilon_{B}$ are the true relative residuals.
+	\end{exm}
+	\begin{alertblock}{Moreover, setting up the stopping criteria $\varepsilon_{1}, \varepsilon_{2}$ s. t. the relative residuals satisfies}	
+		\begin{equation*}
+			\kappa(A) \varepsilon_{B} ( 1 + \varepsilon_{A} ) + \varepsilon_{A} \leq \varepsilon_{tol} \quad \alert{?}
+		\end{equation*}
+	\end{alertblock}
 \end{frame}
 
 
 \section{Conclusions and future work}
 \begin{frame}{Conclusions}
-	
-	\begin{itemize}
-		\item \textbf{Direct Combined Approach}: Error is bounded by the condition number of the product $C = AB$.
-		\item \textbf{Two-Stage Approach}: Error in $y$ ($\| \delta y \| \propto \kappa(A)$) propagates to $x$. 
-		\item \textbf{Observation}: If $A$ is extremely ill-conditioned, the intermediate solution $y$ may lose significant precision, leading to stagnation in the second stage.
-	\end{itemize}
+	\begin{enumerate}
+		\item[A1] \textit{(Separate)} Setting up solvers for the two stages is generally complicated. However, a theoretical analysis on the relative resiual (of which Krylov subspace methods take good control) is delivered, by which practical stopping criteria become possible.
+		\item[A2] \textit{(Combined)} Although not a thorough analysis, we found a $\mathrm{cond}(AB)$ is a great factor which influences the performance of \textit{the combined approach}.
+	\end{enumerate}	
 
 \end{frame}
-\begin{frame}{Summary and future directions}
+\begin{frame}{Future work}
 	\begin{itemize}
-		\item \textbf{Summary}: Direct approach is more robust against ill-conditioning but computationally intensive if sparsity is not preserved. Two-stage approach is flexible but requires careful error management.
-		\item \textbf{Future Work}: 
-		\begin{itemize}
-			\item Test the two approach on more extreme cases, eg. when Krylov subspace stagnate ot breakdown
-			\item Developing adaptive switching between approaches based on $\kappa(A), \kappa(B)$.
-		\end{itemize}
+		\item After developing practical stopping criteria, the two approaches could be compared within larger range of problems
+		\item Could the preconditiond linear solvers be analysed with the same tools?
 	\end{itemize}
 \end{frame}
 
-\section{Appendix}
+\section{Appendices}
 \begin{frame}{Toeplitz matrices}
 	Two class of toeplitz matrices are used in our model problem. They can be expressed in the following structures.
 
@@ -464,31 +477,18 @@ $\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
 \end{frame}
 
 \begin{frame}[fragile]{Toeplitz matrices: detailed parameters}
-	\begin{lstlisting}
-
-		matrix_size = 1000
-		toeplitz_gamma = -0.9, 0.9, -0.99, 0.99
-		toeplitz_gamma_2 = 0.9, -0.9, 0.99, -0.99
-		toeplitz_upper = 1, 1, 1, -1
-		toeplitz_upper_2 = 1, 1, -1, 1
-	\end{lstlisting}	
-\end{frame}
-
-\begin{frame}{estimated condition number of the problem}
-	\begin{table}
-		\begin{tabular}{ c c c c c}
-			\toprule
-			$a_1$ & $a_2$ & $\kappa(a)$ & $\kappa(b)$ & $\kappa(ab)$\\
-			\midrule
-			$1000$ & $900$ &  $145.4249$ & $147.7126$ &  $1.8481\times 10^{4}$\\
-			$1000$ & $20$ & $145.4249$ & $5.1060\times 10^{3}$ & $4.2768\times 10^{5}$ \\ 
-			$15$ & $900$ & $6.4982\times 10^{3}$ & $147.7126$ & $9.8099\times 10^{4}$\\
-			$15$ & $20$ & $6.4982\times 10^{3}$ & $5.1060\times 10^{3}$ & $9.4116\times 10^{5}$\\
-			\bottomrule
+	\centering
+	\begin{jm}
+		\begin{tabular}{l l}
+			matrix\_size & = 1000	\\
+			toeplitz\_gamma & = \\
+			toeplitz\_gamma\_2 & = \\
+			toeplitz\_upper & = \\
+			toeplitz\_upper\_2 & = \\
 		\end{tabular}
-	\end{table}
-	
+	\end{jm}
 \end{frame}
+
 \begin{frame}{Special cases}
 	\textbf{Preconditioning}:
 	\begin{itemize}
@@ -506,4 +506,18 @@ $\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
 	This shows that even if the second system $Bx=y$ is solved with a small residual, the global residual can be magnified by $\|A\|$.
 \end{frame}
 
+\begin{frame}{Summary}
+	\begin{enumerate}
+		\item A good condition of $AB$ generally leads to better performance of \textit{the combined approach} (less CPU time)
+		\item \textit{The separate approach} with stopping criteria $\varepsilon_{1} = \varepsilon_{tol}, \varepsilon_{2} = \varepsilon_{tol}$ risks accuracy loss $\rightarrow$ a different setting, $\varepsilon_{1} = \alert{?}, \varepsilon_{2} = \alert{?}$
+		\item The order of $A$ and  $B$: the effect of $\kappa(A)$
+	\end{enumerate}
+\end{frame}
+\begin{frame}{On setting up proper stopping criteria}
+	case	
+\end{frame}
+
+\begin{frame}{Numerical experiment: comparison of two approaches}
+	case
+\end{frame}
 \end{document}
