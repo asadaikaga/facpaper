@@ -12,6 +12,7 @@
 \usepackage[mathrm=sym]{unicode-math}
 \renewcommand{\bm}{\symbfit}
 \setmathfont{Fira Math}
+\setmathfont{TeX Gyre DejaVu Math}[range={\vdots,\ddots}]
 % \setmainfont{}
 % \setsansfont{Fira Sans}
 % \setsansfont{Fira Sans}
@@ -34,6 +35,7 @@
   \textbf{#1}\par
   \smallskip
 }
+\usepackage{listings}
 
 % Title page details: 
 \title{On two numerical approaches for linear systems $AB \bm{x} = \bm{b}$} 
@@ -135,7 +137,7 @@ krylov $A \bm{y} = \bm{b}$ $|$ krylov $B \bm{x} = \bm{y}$ & gmres $A \bm{y} = \b
 		$A \in \mathbb{R} ^{n \times n}, B \in \mathbb{R} ^{n \times n}, N_{nz}(A)=O(n), N_{nz}(B) = O(n)$
 	\begin{itemize}
 		\item \textit{\sout{Explicit formulation}}: matrix multiplication $AB$ $\rightarrow O({n}^{3})$
-		\item \textit{Implicit formulation}: matrix-vector product  $\underbracket{A(B \bm{b})}_{\text{Krylov}}$$\rightarrow O(n)$
+		\item \textit{Implicit formulation}: matrix-vector product $\underbracket{A(B \bm{b})}_{\text{Krylov}} \rightarrow O(n)$
 	\end{itemize}
 \end{block}
 \begin{block}{Warning (Krylov subspce methods):}
@@ -154,14 +156,14 @@ $\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
 \begin{frame}{Research Motivation}
 	\begin{block}{Things we have known}
 		\vspace{1pt}	
-		\begin{enumerate}{}	
+		\begin{enumerate}
 			\item \textit{the separate approach:} flexible solver choice on each stage
 			\item \textit{the combined approach:} specific to Krylov methods, condition of $AB$
 		\end{enumerate}
 	\end{block}
 	\begin{block}{Things to make clear}
 		\vspace{1pt}	
-	\begin{enumerate}{}
+	\begin{enumerate}
 		\item[Q1:] rules for setting up solvers in \textit{the separate approach}
 		\item[Q2:] conditions when \textit{the combined approach} is a good choice \& those when \textit{the separate approach} is a good choice
 		\item[Q3:] what will happen if preconditioned algorithms are applied?
@@ -249,132 +251,170 @@ $\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
 % \end{tikzpicture}
 % \end{frame}
 
-\section{Classifications on the model problem: Toeplitz matrices}
-\begin{frame}{Numerical experiments}
-	\textbf{Motivation:}
+\section{The model problem: Toeplitz matrices}
+\begin{frame}{Before the discussion: how to set up stopping criteria}
+	Solve the linear system $AB \bm{x} = \bm{b}$ within the tolerance $\varepsilon_{tol}$, s.t.
+	\begin{equation}\label{toldef}	
+		\text{relative residual \textit{(rel. res.)}} = \cfrac{\|\bm{b} - A B \bm{x}\|}{\|\bm{b}\|} \leq \varepsilon_{tol}
+	.
+	\end{equation}
+	However, our setting:
 
-	It is widely recognized that the convergence rate of a linear system $C \bm{x} = \bm{b}$ is relevant to conditioin number $\kappa(C)$. However, for linear system $AB \bm{x} = \bm{b}$, the convergence is also relevant to both $\kappa(A), \kappa(B)$.
-	
+	\begin{minipage}{0.63\textwidth}	
+	\begin{block}{The separate method}
+		\begin{equation*}
+			\underbracket{\text{Krylov}}_{\epsilon_1 = \varepsilon_{tol}} \text{ } A \bm{y} = \bm{b} \text{ }| \text{ } \underbracket{\text{Krylov}}_{\varepsilon_2 = \varepsilon_{tol}} \text{ } B \bm{x} = \bm{y}\xrightarrow{\text{leads to}} \textit{rel. res.} \leq \varepsilon_{tol}
+		\end{equation*}	
+	\end{block}
+	\begin{block}{The combined method}
+		\begin{equation*}
+			\underbracket{\text{Krylov}}_{\varepsilon_{c} = \varepsilon_{tol}} \text{ } AB \bm{x} = \bm{b}\xrightarrow{\text{leads to}} \textit{rel. res.} \leq \varepsilon_{tol}
+		\end{equation*}		
+	\end{block}
+	\end{minipage}%
+	\hfill
+	\begin{minipage}{0.33\textwidth}	
+		\begin{alertblock}{A properly defined stopping criteria?}
+			\vspace{1em}
+			Some sentences			
+		\end{alertblock}
+	\end{minipage}
+\end{frame}
+\begin{frame}{Model Problem \textit{(Toeplitz)}, case 1}
+	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat})
 
-	\textbf{Experiment objective}
-	\begin{itemize}
-		\item Compare the convergence rate and accuracy of Approach 1 and Approach 2 under different condition number $\kappa(A)$ and $\kappa(B)$ settings.
-	\end{itemize}
-	\textbf{Experiment Problem and Methods}
-	A, B are random sparse matrices, and problems are solved with the bicgstab function in MATLAB
-\end{frame}
-\begin{frame}{Algorithmic behaviour in relation to the condition number (residual norm)}
-	\textbf{Problem:} Let $R\in \mathbb{R}^{n\times n}$ be a random sparse matrix, and $ D \in \mathbb{R}^{n\times n}$ be a diagonal matrix
-	\begin{itemize}
-		\item $A = R + a_1 * D$
-		\item $B = R + a_2 * D$
-	\end{itemize}
-	\begin{table}\label{tab:1}
-		\begin{tabular}{c c c c c}
+	\begin{minipage}[t]{0.63\textwidth}
+		\vspace{0pt}
+		\begin{tabular}{l c c}
 			\toprule
-			method & $a_1$ & $a_2$ & iter. & true rel. res.\\
+			Method & CPU(s) & true rel. res.\\
 			\midrule
-			direct & $1000$ & $900$ & $153$ & $7.9608\times 10^{-7}$\\
-			two-stage & $1000$ & $900$ & $63$ & $5.3264\times 10^{-7}$\\
-			direct & $1000$ & $20$ & $254$ & $2.7258\times 10^{-7}$\\
-			two-stage & $1000$ & $20$ & $91$ & $ 9.9434\times 10^{7}$\\
-			direct & $15$ & $900$ & $329$ & $7.2945\times 10^{-7}$\\
-			two-stage & $15$ & $900$ & $125$ & $6.3144\times 10^{-7}$\\
-			direct & $15$ & $20$ & $619$ & $6.7655\times 10^{7}$\\
-			two-stage & $15$ & $20$ & $116$ & $2.9931\times 10^{-7}$\\
+			Separate& $9.94 \times 10^{-4}$ & $8.98 \times 10^{-5}$ \\
+			Combined& $6.47 \times 10^{-4}$& $6.58 \times 10^{-5}$\\
 			\bottomrule
 		\end{tabular}
-	\end{table}
-\end{frame}
-\begin{frame}{Algorithmic behaviour in relation to the condition number (error norm)}
-	
-	\textbf{Problem:} Let $R\in \mathbb{R}^{n\times n}$ be a random sparse matrix, and $D\in \mathbb{R}^{n\times n}$ be a diagonal matrix
-	\begin{itemize}
-		\item $A = R + a_1 * D$
-		\item $B = R + a_2 * D$
-	\end{itemize}
-	\begin{table}\label{tab:1}
-		\begin{tabular}{c c c c c}
-			\toprule
-			method & $a_1$ & $a_2$ & iter. & rel. err.\\
-			\midrule
-			direct & $1000$ & $900$ & $153$ & $0.0041$\\
-			two-stage & $1000$ & $900$ & $63$ & $0.0005$\\
-			direct & $1000$ & $20$ & $254$ & $0.0055$\\
-			two-stage & $1000$ & $20$ & $91$ & $0.0061$\\
-			direct & $15$ & $900$ & $329$ & $0.0062$\\
-			two-stage & $15$ & $900$ & $125$ & $0.0052$\\
-			direct & $15$ & $20$ & $619$ & $0.0680$\\
-			two-stage & $15$ & $20$ & $116$ & $0.0317$\\
-			\bottomrule
-		\end{tabular}
-	\end{table}
-\end{frame}
-\begin{frame}{Algorithmic behaviour in relation to the condition number (residual norm)}
-	\textbf{Problem:} Let $R\in \mathbb{R}^{n\times n}$ be a random sparse matrix, and $ D \in \mathbb{R}^{n\times n}$ be a diagonal matrix
-	\begin{itemize}
-		\item $A = R_1 + a_1 * D$, then let $A(1,1) = A(1,1)\times 10^{3}$
-		\item $B = R_2 + a_2 * D$, then let $B(1,1) = B(1,1) \times 10^{-3}$
-	\end{itemize}
-	\begin{table}\label{tab:1}
-		\begin{tabular}{c c c c c}
-			\toprule
-			method & $a_1$ & $a_2$ & iter. & true rel. res.\\
-			\midrule
-			direct & $100$ & $50$ & $16$ & $9.4735\times 10^{-7}$\\
-			two-stage & $100$ & $50$ & $23$ & $2.2419\times 10^{-4}$\\
-			direct & $1000$ & $20$ & $254$ & $2.7258\times 10^{-7}$\\
-			two-stage & $1000$ & $20$ & $91$ & $ 9.9434\times 10^{7}$\\
-			direct & $15$ & $900$ & $329$ & $7.2945\times 10^{-7}$\\
-			two-stage & $15$ & $900$ & $125$ & $6.3144\times 10^{-7}$\\
-			direct & $15$ & $20$ & $619$ & $6.7655\times 10^{7}$\\
-			two-stage & $15$ & $20$ & $116$ & $2.9931\times 10^{-7}$\\
-			\bottomrule
-		\end{tabular}
-	\end{table}
+	\end{minipage}%
+	\hfill
+	\begin{minipage}[t]{0.33\textwidth}
+		\vspace{0pt}
+		$\mathrm{cond} (A) \approx 2.25 $\\
+		$\mathrm{cond} (B) \approx 2.25$\\
+		$\mathrm{cond} (AB) \approx 1.95$
+	\end{minipage}
+
+	\begin{block}{Conclusions:}
+		\vspace{0pt}
+		$\mathrm{cond} (AB) \leq \min\{ \mathrm{cond}(A) \mathrm{cond} (B)\}$
+	\end{block}
 \end{frame}
 
-\begin{frame}{Algorithmic behaviour in relation to the condition number (error norm)}
-	
-	\textbf{Problem:} Let $R\in \mathbb{R}^{n\times n}$ be a random sparse matrix, and $D\in \mathbb{R}^{n\times n}$ be a diagonal matrix
-	\begin{itemize}
-		\item $A = R_1 + a_1 * D$
-		\item $B = R_2 + a_2 * D$
-	\end{itemize}
-	\begin{table}\label{tab:1}
-		\begin{tabular}{c c c c c}
+\begin{frame}{Model Problem \textit{(Toeplitz)}, case 2}
+	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat})
+
+	\begin{minipage}[t]{0.63\textwidth}
+		\vspace{0pt}
+		\begin{tabular}{l c c}
 			\toprule
-			method & $a_1$ & $a_2$ & iter. & rel. err.\\
+			Method & CPU(s) & true rel. res.\\
 			\midrule
-			direct & $100$ & $50$ & $16$ & $3.2882\times 10^{-6}$\\
-			two-stage & $100$ & $50$ & $23$ & $5.5756\times 10^{-5}$\\
-			direct & $1000$ & $20$ & $254$ & $0.0055$\\
-			two-stage & $1000$ & $20$ & $91$ & $0.0061$\\
-			direct & $15$ & $900$ & $329$ & $0.0062$\\
-			two-stage & $15$ & $900$ & $125$ & $0.0052$\\
-			direct & $15$ & $20$ & $619$ & $0.0680$\\
-			two-stage & $15$ & $20$ & $116$ & $0.0317$\\
+			Separate& $2.22 \times 10^{-3}$ & $1.32 \times 10^{-4}$ \\
+			Combined& $1.10 \times 10^{-3}$& $7.70 \times 10^{-5}$\\
 			\bottomrule
 		\end{tabular}
-	\end{table}
+	\end{minipage}%
+	\hfill
+	\begin{minipage}[t]{0.33\textwidth}
+		\vspace{0pt}
+		$\mathrm{cond} (A) \approx 334.82 $\\
+		$\mathrm{cond} (B) \approx 2.88$\\
+		$\mathrm{cond} (AB) \approx 168.67$
+	\end{minipage}
+
+	\begin{block}{Conclusions:}
+		\vspace{0pt}
+	\end{block}
 \end{frame}
 
-\begin{frame}{estimated condition number of the problem}
-	\begin{table}
-		\begin{tabular}{ c c c c c}
+\begin{frame}{Model Problem \textit{(Toeplitz)}, case 3}
+	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat})
+
+	\begin{minipage}[t]{0.63\textwidth}
+		\vspace{0pt}
+		\begin{tabular}{l c c}
 			\toprule
-			$a_1$ & $a_2$ & $\kappa(a)$ & $\kappa(b)$ & $\kappa(ab)$\\
+			Method & CPU(s) & true rel. res.\\
 			\midrule
-			$100$ & $50$ &  $7.1200\times 10^{3}$ & $1.4675\times 10^{4}$ &  $6.5934\times 10^{3}$\\
-			$1000$ & $20$ & $145.4249$ & $5.1060\times 10^{3}$ & $4.2768\times 10^{5}$ \\ 
-			$15$ & $900$ & $6.4982\times 10^{3}$ & $147.7126$ & $9.8099\times 10^{4}$\\
-			$15$ & $20$ & $6.4982\times 10^{3}$ & $5.1060\times 10^{3}$ & $9.4116\times 10^{5}$\\
+			Separate& $1.82 \times 10^{-3}$ & $1.28 \times 10^{-4}$ \\
+			Combined& $1.10 \times 10^{-3}$& $7.70 \times 10^{-5}$\\
 			\bottomrule
 		\end{tabular}
-	\end{table}
-	
+	\end{minipage}%
+	\hfill
+	\begin{minipage}[t]{0.33\textwidth}
+		\vspace{0pt}
+		$\mathrm{cond} (A) \approx 2.88 $\\
+		$\mathrm{cond} (B) \approx 334.82$\\
+		$\mathrm{cond} (AB) \approx 168.67$
+	\end{minipage}
+
+	\begin{block}{Conclusions:}
+		\vspace{0pt}
+		This is the conclusion	
+	\end{block}
 \end{frame}
-\section{Test the classifications on matrix market problems}
+
+\begin{frame}{Model Problem \textit{(Toeplitz)}, case 4}
+	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat})
+
+	\begin{minipage}[t]{0.63\textwidth}
+		\vspace{0pt}
+		\begin{tabular}{l c c}
+			\toprule
+			Method & CPU(s) & true rel. res.\\
+			\midrule
+			Separate& $1.96 \times 10^{-3}$ & $9.95 \times 10^{-5}$ \\
+			Combined& $2.61 \times 10^{-3}$& $8.66 \times 10^{-5}$\\
+			\bottomrule
+		\end{tabular}
+	\end{minipage}%
+	\hfill
+	\begin{minipage}[t]{0.33\textwidth}
+		\vspace{0pt}
+		$\mathrm{cond} (A) \approx 2.66 $\\
+		$\mathrm{cond} (B) \approx 33.98$\\
+		$\mathrm{cond} (AB) \approx 47.86$
+	\end{minipage}
+
+	\begin{block}{Conclusions:}
+		\vspace{0pt}
+		This is the conclusion	
+	\end{block}
+\end{frame}
+\begin{frame}{Summary}
+	\begin{block}{Model Problem, case 1}
+		\vspace{1pt}
+		The case
+	\end{block}
+	\begin{block}{Model Problem, case 2}
+		\vspace{1pt}
+		The case
+	\end{block}	
+\end{frame}
+
+\begin{frame}{Theorem}
+	The theorem? In mathematics.
+\end{frame}
+
+\section{Numerical Experiment}
+\begin{frame}{On setting up proper stopping criteria}
+	case	
+\end{frame}
+
+\begin{frame}{Numerical experiment: comparison of two approaches}
+	case
+\end{frame}
+
+
 \section{Conclusions and future work}
 \begin{frame}{Conclusions}
 	
@@ -395,13 +435,45 @@ $\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
 		\end{itemize}
 	\end{itemize}
 \end{frame}
-\begin{frame}{Research plans}
-	\begin{enumerate}
-		\item EASIAM $\rightarrow$ enrich this work
-		\item ICMASE $\rightarrow$ another work on hybrid Krylov subspace method
-	\end{enumerate}
-\end{frame}
+
 \section{Appendix}
+\begin{frame}{Toeplitz matrices}
+	Two class of toeplitz matrices are used in our model problem. They can be expressed in the following structures.
+
+\begin{equation}\label{toemat}
+	\mathcal{A}: \mqty{
+	2 & 1& & & & \\
+	0& 2& 1& & & \\
+	\gamma&0 & 2& 1& & \\
+	& \ddots&\ddots & \ddots& \ddots& \\
+	& & \gamma&0 & 2& 1\\
+	& & & \gamma& 0& 2
+},
+\quad
+\mathcal{B}:
+\mqty{
+	2 & -1& & & & \\
+	0& 2& -1& & & \\
+	\delta&0 & 2& -1& & \\
+	& \ddots&\ddots & \ddots& \ddots& \\
+	& & \delta&0 & 2& -1\\
+	& & & \delta& 0& 2
+}
+.
+\end{equation}
+\end{frame}
+
+\begin{frame}[fragile]{Toeplitz matrices: detailed parameters}
+	\begin{lstlisting}
+
+		matrix_size = 1000
+		toeplitz_gamma = -0.9, 0.9, -0.99, 0.99
+		toeplitz_gamma_2 = 0.9, -0.9, 0.99, -0.99
+		toeplitz_upper = 1, 1, 1, -1
+		toeplitz_upper_2 = 1, 1, -1, 1
+	\end{lstlisting}	
+\end{frame}
+
 \begin{frame}{estimated condition number of the problem}
 	\begin{table}
 		\begin{tabular}{ c c c c c}
