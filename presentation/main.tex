@@ -40,7 +40,7 @@
 
 % Title page details: 
 \title{On two numerical approaches for linear systems $AB \bm{x} = \bm{b}$} 
-\author{XU Zhixuan \inst{1} \and Sogabe Tomohiro \inst{1} \and Kemmochi Tomoya \inst{2} \and Shao-Liang Zhang \inst{1}}
+\author{XU Zhixuan \inst{1} \and Sogabe Tomohiro \inst{1} \and Kemmochi Tomoya \inst{2} \and Takeda Kouta \inst{1}\\ \and Zhang Shao-Liang \inst{1}}
 \institute{
 	\inst{1} \textit{Department of Applied Physics, Nagoya University}
 	\and 
@@ -66,7 +66,7 @@
 
 
 % Lists frame
-\section{Research problem}
+\section{Research problem, research backgound, and our main contribution}
 \begin{frame}{Numerical methods for a linear system $AB \bm{x} = \bm{b}$}
 	We consider numerically solving a linear system in the form  
 	\begin{equation}\label{eq:fls}
@@ -108,6 +108,17 @@ In the present research, we study two numerical approaches, \textit{the separate
 		\end{table}
 \end{frame}
 
+\begin{frame}{Our main contribution}
+	\textbf{Main goal:} To understand the numerical behavior of the two approaches\\
+	\textbf{Our findings so far:} In particular, we show that.
+		\begin{itemize}
+			\item accuracy loss of \textit{the separate approach} when stopping criteria is set trivially
+			\item better performance of \textit{the combined approach} when the condition number $\kappa(AB)$ is good
+		\end{itemize}
+		\textbf{Current result:} As a first theoretical step toward understanding this behavior, we establish theorem on the relative residual bound of \textit{the separate approach}
+\end{frame}
+
+\section{Numerical approaches and a theorem on the relative residual (preliminary)}
 \begin{frame}{Approach 1: The separate approach (Two-stage solve)}
 	Approach 1 is based on the equivalent expression
 	\begin{equation}
@@ -141,39 +152,52 @@ krylov $A \bm{y} = \bm{b}$ $|$ krylov $B \bm{x} = \bm{y}$ & gmres $A \bm{y} = \b
 		\item \textit{Implicit formulation}: matrix-vector product $\underbracket{A(B \bm{b})}_{\text{Krylov}} \rightarrow O(n)$
 	\end{itemize}
 \end{block}
-\begin{alertblock}{Warning (Krylov subspce methods):}
-	\vspace{1pt}
-	Memory $\rightarrow$ Sparsity 
-$\xrightarrow{\text{specifically}}$ Sparsity of $AB$\\
-	Accuracy $\rightarrow$ \underline{Condition}
-$\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
-	\vspace{0.5em}
-	Number of iterations $\rightarrow$ \underline{Condition}
-	$\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
-\end{alertblock}
+\begin{block}{Example: on its memory usage, accuracy, and convergence rate}
+	\vspace{0pt}
+	Memory usage \textit{(implicit formulation)}: $mO(n)$, $m$ is number of iterations\\
+	Accuracy \textit{(Krylov subspace methods)}: relative residual\\
+	Convergence rate \textit{(Krylov subspace methods)}: the condition number $\kappa(AB)$
+\end{block}
 % The direct combined approach is worth considering (in computational cost) when \textcolor{red}{Krylov subspace method} is applied.
 \end{frame}
 
+\begin{frame}{\textit{Separate}: our theorem on the relative residual bound}
+	\begin{thm}[Relative residual of the separate approach]\label{relthm}
+		\vspace{0pt}
+		Consider matrices $A , B , C \in \mathbb{C}^{n \times n}$, vectors $\bm{y}, \bm{b}, \bm{x}, \bm{r}_{A}, \bm{r}_{B} \in \mathbb{C}^{n}$ ($C = AB$, $\bm{b} \neq \bm{0}$), of which the following relations are satisfied:
+		\begin{align*}
+			A\bm{y} & = \bm{b} + \bm{r}_{A}, \quad (\varepsilon_{A} = \frac{\|\bm{r}_{A}\|}{\|\bm{b}\|}) \\
+			B \bm{x} & = \bm{y} + \bm{r}_{B}, \quad (\varepsilon_{A} = \frac{\|\bm{r}_{A}\|}{\|\bm{b}\|})
+		\end{align*}
+	then we have the following inequatlity:
+	\begin{equation}
+	\frac{\|\bm{b} - AB \bm{x}\|}{\|\bm{b}\|} \leq \kappa(A) \varepsilon_{B} ( 1 + \varepsilon_{A} ) + \varepsilon_{A}	
+	.
+	\end{equation}
+	\vspace{-2em}
+	\begin{proof}
+		See Appendices	
+	\end{proof}	
+	\end{thm}
+\end{frame}
 \begin{frame}{Research Motivation}
 	\begin{block}{Things we have known}
 		\vspace{1pt}	
 		\begin{enumerate}
 			\item \textit{the separate approach:} flexible solver choice on each stage
 			\item \textit{the combined approach:} specific to Krylov methods, condition of $AB$
+			\item accuracy of the two approaches: be careful of \textit{separate} since the relative residual is not well bounded
 		\end{enumerate}
 	\end{block}
 	\begin{block}{Things to make clear}
 		\vspace{1pt}	
 	\begin{enumerate}
-		\item[Q1:] rules for setting up solvers in \textit{the separate approach}
-		\item[Q2:] conditions when \textit{the combined approach} is a good choice \& those when \textit{the separate approach} is a good choice
+		\item[Q1:] (Algorithm setup) how can we setup solvers in \textit{the separate approach}
+		\item[Q2:] (Comparison of approaches) when \textit{the combined approach} is a good choice \& those when \textit{the separate approach} is a good choice
 	\end{enumerate}
 	\end{block}
-	\begin{alertblock}{To answer the questions}
-		\vspace{1pt}
-		classification of $A,B$ $\rightarrow$ condition number $\rightarrow$ convergence and accuracy
-	\end{alertblock}
 \end{frame}
+
 % \begin{frame}{Condition number and our classification}
 % 	\begin{tikzpicture}[
 %     font=\small,
@@ -251,7 +275,7 @@ $\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
 % \end{tikzpicture}
 % \end{frame}
 
-\section{The model problem: Toeplitz matrices}
+\section{Our findings on the model problem (Toeplitz matrices)}
 \begin{frame}{Before the discussion: how to set up stopping criteria}
 	Solve the linear system $AB \bm{x} = \bm{b}$ within the tolerance $\varepsilon_{tol}$, s.t.
 	\begin{equation}\label{toldef}	
@@ -260,7 +284,6 @@ $\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
 	\end{equation}
 	\sout{However}, our setting:
 
-	\begin{minipage}{0.63\textwidth}	
 	\begin{block}{The combined method}
 		\begin{equation*}
 			\underbracket{\text{Krylov}}_{\varepsilon_{c} = \varepsilon_{tol}} \text{ } AB \bm{x} = \bm{b}\xrightarrow{\text{leads to}} \textit{rel. res.} \leq \varepsilon_{tol}
@@ -271,14 +294,6 @@ $\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
 			\underbracket{\text{Krylov}}_{\epsilon_1 = \varepsilon_{tol}} \text{ } A \bm{y} = \bm{b} \text{ }| \text{ } \underbracket{\text{Krylov}}_{\varepsilon_2 = \varepsilon_{tol}} \text{ } B \bm{x} = \bm{y}\xrightarrow{\alert{\text{leads to??}}}  \hbox{\sout{$\textit{rel. res.} \leq \varepsilon_{tol}$}}
 		\end{equation*}	
 	\end{block}
-	\end{minipage}%
-	\hfill
-	\begin{minipage}{0.33\textwidth}	
-		\begin{alertblock}{A properly defined stopping criteria?}
-			\vspace{1em}
-			\sout{A theoretical result saying: you can be that accurate if you do as told}
-		\end{alertblock}
-	\end{minipage}
 \end{frame}
 \begin{frame}{Model Problem \textit{(Toeplitz)}, case 1}
 	$A$ and $B$ are Toeplitz matrices (matrix form in \eqref{toemat}), and their condition numbers
@@ -402,35 +417,17 @@ $\xrightarrow{\text{spec.}}$ \underline{Condition} of $AB$\\
 	\end{enumerate}
 \end{frame}
 
-\begin{frame}{Toward a possible proper stopping criteria: our theorem}
-	\begin{thm}[Relative residual of the separate approach]
+\begin{frame}{Discussions: toward a possible proper stopping criteria (open)}
+	\begin{col}[Relations to \textit{the separate approach}]
 		\vspace{0pt}
-		Consider matrices $A , B , C \in \mathbb{C}^{n \times n}$, vectors $\bm{y}, \bm{b}, \bm{x}, \bm{r}_{A}, \bm{r}_{B} \in \mathbb{C}^{n}$ ($C = AB$, $\bm{b} \neq \bm{0}$), of which the following relations are satisfied:
+		Consider our separate approach:	Solve $A \bm{y} = \bm{b}$ $|$ Solve $B \bm{x} = \bm{y}$. Let $\bm{y}$ be the output after solving $A \bm{y} = \bm{b}$, and $\bm{x}$ be the output after solving $B \bm{x} = \bm{y}$. Residuals $\bm{r}_{A}, \bm{r}_{B}$ represent the inaccuracy of the approximated solution $\bm{y}, \bm{x}$. $\varepsilon_{A}, \varepsilon_{B}$ are the true relative residuals.
 		\begin{align*}
 			A\bm{y} & = \bm{b} + \bm{r}_{A}, \quad (\varepsilon_{A} = \frac{\|\bm{r}_{A}\|}{\|\bm{b}\|}) \\
 			B \bm{x} & = \bm{y} + \bm{r}_{B}, \quad (\varepsilon_{A} = \frac{\|\bm{r}_{A}\|}{\|\bm{b}\|})
 		\end{align*}
-	then we have the following inequatlity:
-	\begin{equation}
-	\frac{\|\bm{b} - AB \bm{x}\|}{\|\bm{b}\|} \leq \kappa(A) \varepsilon_{B} ( 1 + \varepsilon_{A} ) + \varepsilon_{A}	
-	.
-	\end{equation}
-	\end{thm}
-\end{frame}
-
-\begin{frame}{Toward a possible proper stopping criteria: the proof and example}
-	\begin{proof}
-		See Appendices	
-	\end{proof}	
-	\begin{exm}[Relations to \textit{the separate approach}]
-		\vspace{0pt}
-		Consider our separate approach:	Solve $A \bm{y} = \bm{b}$ $|$ Solve $B \bm{x} = \bm{y}$. Let $\bm{y}$ be the output after solving $A \bm{y} = \bm{b}$, and $x$ be the output after solving $B \bm{x} = \bm{y}$. Residuals $\bm{r}_{A}, \bm{r}_{B}$ represent the inaccuracy of the approximated solution $\bm{y}, \bm{x}$. $\varepsilon_{A}, \varepsilon_{B}$ are the true relative residuals.
-	\end{exm}
-	\begin{alertblock}{Moreover, setting up the stopping criteria $\varepsilon_{1}, \varepsilon_{2}$ s. t. the relative residuals satisfies}	
-		\begin{equation*}
-			\kappa(A) \varepsilon_{B} ( 1 + \varepsilon_{A} ) + \varepsilon_{A} \leq \varepsilon_{tol} \quad \alert{?}
-		\end{equation*}
-	\end{alertblock}
+		\alert{Setting up the stopping criteria $\varepsilon_{1}, \varepsilon_{2}$ s. t. the relative residuals satisfies} $\kappa(A) \varepsilon_{B} ( 1 + \varepsilon_{A} ) + \varepsilon_{A} \leq \varepsilon_{tol}$ \textit{(Note that in Theorem \ref{relthm} $\frac{\|\bm{b} - AB \bm{x}\|}{\|\bm{b}\|} \leq \kappa(A) \varepsilon_{B} ( 1 + \varepsilon_{A} ) + \varepsilon_{A}$)}\\
+		\alert{Then, $\bm{x}$ is a good approximation whose relative reisudal is bounded.}
+	\end{col}
 \end{frame}
 
 
